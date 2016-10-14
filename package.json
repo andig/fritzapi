@@ -1,0 +1,51 @@
+{
+  "name": "fritzapi",
+  "version": "0.8.0",
+  "author": "Andreas Goetz <cpuidle@gmx.de>",
+  "description": "Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices",
+  "homepage": "https://github.com/andig/fritzapi",
+  "license": "MIT",
+  "contributors": [
+    {
+      "name": "Steffen Timm",
+      "email": "s.timm@nischi.net"
+    },
+    {
+      "name": "nischi.at",
+      "url": "http://www.nischelwitzer.at"
+    }
+  ],
+  "keywords": [
+    "Fritz!Box",
+    "Fritz!DECT",
+    "Fritz!Powerline",
+    "FritzBox",
+    "Fritz Box",
+    "Comet!DECT",
+    "Comet DECT",
+    "Dect 100",
+    "Dect 200",
+    "Dect 210",
+    "SmartHome",
+    "SmartFritz",
+    "AHA"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andig/fritzapi.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/jshint/bin/jshint index.js"
+  },
+  "dependencies": {
+    "bluebird": "^3.0.2",
+    "cheerio": "^0.19.0",
+    "request": ">=2.45.*",
+    "extend": "^3.0.0",
+    "xml2json-light": "^1.0.4"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.2"
+  }
+}
