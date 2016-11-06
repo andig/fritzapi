@@ -310,7 +310,10 @@ module.exports.getSessionID = function(username, password, options)
         var url = "/login_sid.lua?username=" + username + "&response=" + challengeResponse;
 
         return executeCommand(null, null, null, options, url).then(function(body) {
-            sessionID = body.match("<SID>(.*?)</SID>")[1];
+            var sessionID = body.match("<SID>(.*?)</SID>")[1];
+            if (sessionID === "0000000000000000") {
+                return Promise.reject(sessionID);
+            }
             return Promise.resolve(sessionID);
         });
     });
@@ -320,7 +323,10 @@ module.exports.getSessionID = function(username, password, options)
 module.exports.checkSession = function(sid, options)
 {
     return executeCommand(sid, null, null, options, '/login_sid.lua').then(function(body) {
-        sessionID = body.match("<SID>(.*?)</SID>")[1];
+        var sessionID = body.match("<SID>(.*?)</SID>")[1];
+        if (sessionID === "0000000000000000") {
+            return Promise.reject(sessionID);
+        }
         return Promise.resolve(sessionID);
     });
 };
