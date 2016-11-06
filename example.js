@@ -1,12 +1,12 @@
 /**
- * smartFritz - Fritz goes smartHome
+ * fritzapi - Fritz goes smartHome
  *
  * AVM SmartHome nodeJS Control - for AVM Fritz!Box and Dect200 Devices
  *
  * @author Andreas Goetz <cpuidle@gmx.de>
  */
 
-var fritz = require('./smartfritz.js');
+var fritz = require('./index.js');
 
 // NOTE: options only needs to be passed to each fritz function call if the Fritz!Box is not
 //       reachable at http://fritz.box

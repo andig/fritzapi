@@ -1,5 +1,5 @@
 /**
- * smartFritz - Fritz goes smartHome
+ * fritzapi - Fritz goes smartHome
  *
  * AVM SmartHome nodeJS Control - for AVM Fritz!Box and Dect200 Devices
  *
@@ -9,7 +9,7 @@
  *    npm install csv
  */
 
-var fritz = require('./smartfritz.js');
+var fritz = require('./index.js');
 var csv = require('csv');
 
 var username = DEFINE HERE;
