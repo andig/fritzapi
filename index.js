@@ -314,7 +314,7 @@ module.exports.getSessionID = function(username, password, options)
             if (sessionID === "0000000000000000") {
                 return Promise.reject(sessionID);
             }
-            return Promise.resolve(sessionID);
+            return sessionID;
         });
     });
 };
@@ -327,7 +327,7 @@ module.exports.checkSession = function(sid, options)
         if (sessionID === "0000000000000000") {
             return Promise.reject(sessionID);
         }
-        return Promise.resolve(sessionID);
+        return sessionID;
     });
 };
 
@@ -349,7 +349,7 @@ module.exports.getDeviceList = function(sid, options)
         var devices = parser.xml2json(devicelistinfo);
         // extract devices as array
         devices = [].concat((devices.devicelist || {}).device || []);
-        return Promise.resolve(devices);
+        return devices;
     });
 };
 
@@ -374,7 +374,7 @@ module.exports.getDevice = function(sid, ain, options)
 module.exports.getTemperature = function(sid, ain, options)
 {
     return executeCommand(sid, 'gettemperature', ain, options).then(function(body) {
-        return Promise.resolve(parseFloat(body) / 10); // °C
+        return parseFloat(body) / 10; // °C
     });
 };
 
@@ -388,7 +388,7 @@ module.exports.getSwitchList = function(sid, options)
 {
     return executeCommand(sid, 'getswitchlist', null, options).then(function(res) {
         // force empty array on empty result
-        return Promise.resolve(res === "" ? [] : res.split(','));
+        return res === "" ? [] : res.split(',');
     });
 };
 
@@ -396,7 +396,7 @@ module.exports.getSwitchList = function(sid, options)
 module.exports.getSwitchState = function(sid, ain, options)
 {
     return executeCommand(sid, 'getswitchstate', ain, options).then(function(body) {
-        return Promise.resolve(/^1/.test(body)); // true if on
+        return /^1/.test(body); // true if on
     });
 };
 
@@ -404,7 +404,7 @@ module.exports.getSwitchState = function(sid, ain, options)
 module.exports.setSwitchOn = function(sid, ain, options)
 {
     return executeCommand(sid, 'setswitchon', ain, options).then(function(body) {
-        return Promise.resolve(/^1/.test(body)); // true if on
+        return /^1/.test(body); // true if on
     });
 };
 
@@ -412,7 +412,7 @@ module.exports.setSwitchOn = function(sid, ain, options)
 module.exports.setSwitchOff = function(sid, ain, options)
 {
     return executeCommand(sid, 'setswitchoff', ain, options).then(function(body) {
-        return Promise.resolve(/^1/.test(body)); // false if off
+        return /^1/.test(body); // false if off
     });
 };
 
@@ -420,7 +420,7 @@ module.exports.setSwitchOff = function(sid, ain, options)
 module.exports.getSwitchEnergy = function(sid, ain, options)
 {
     return executeCommand(sid, 'getswitchenergy', ain, options).then(function(body) {
-        return Promise.resolve(parseFloat(body)); // Wh
+        return parseFloat(body); // Wh
     });
 };
 
@@ -428,7 +428,8 @@ module.exports.getSwitchEnergy = function(sid, ain, options)
 module.exports.getSwitchPower = function(sid, ain, options)
 {
     return executeCommand(sid, 'getswitchpower', ain, options).then(function(body) {
-        return Promise.resolve(parseFloat(body) / 1000); // W
+        var power = parseFloat(body);
+        return power === null ? null : power / 1000; // W
     });
 };
 
@@ -436,7 +437,7 @@ module.exports.getSwitchPower = function(sid, ain, options)
 module.exports.getSwitchPresence = function(sid, ain, options)
 {
     return executeCommand(sid, 'getswitchpresent', ain, options).then(function(body) {
-        return Promise.resolve(/^1/.test(body)); // true if present
+        return /^1/.test(body); // true if present
     });
 };
 
@@ -444,7 +445,7 @@ module.exports.getSwitchPresence = function(sid, ain, options)
 module.exports.getSwitchName = function(sid, ain, options)
 {
     return executeCommand(sid, 'getswitchname', ain, options).then(function(body) {
-        return Promise.resolve(body.trim());
+        return body.trim();
     });
 };
 
@@ -470,7 +471,7 @@ module.exports.getThermostatList = function(sid, options)
             return device.identifier.replace(/\s/g, '');
         });
 
-        return Promise.resolve(thermostats);
+        return thermostats;
     });
 };
 
@@ -479,7 +480,7 @@ module.exports.setTempTarget = function(sid, ain, temp, options)
 {
     return executeCommand(sid, 'sethkrtsoll&param=' + temp2api(temp), ain, options).then(function(body) {
         // api does not return a value
-        return Promise.resolve(temp);
+        return temp;
     });
 };
 
@@ -487,7 +488,7 @@ module.exports.setTempTarget = function(sid, ain, temp, options)
 module.exports.getTempTarget = function(sid, ain, options)
 {
     return executeCommand(sid, 'gethkrtsoll', ain, options).then(function(body) {
-        return Promise.resolve(api2temp(body));
+        return api2temp(body);
     });
 };
 
@@ -495,7 +496,7 @@ module.exports.getTempTarget = function(sid, ain, options)
 module.exports.getTempNight = function(sid, ain, options)
 {
     return executeCommand(sid, 'gethkrabsenk', ain, options).then(function(body) {
-        return Promise.resolve(api2temp(body));
+        return api2temp(body);
     });
 };
 
@@ -503,7 +504,7 @@ module.exports.getTempNight = function(sid, ain, options)
 module.exports.getTempComfort = function(sid, ain, options)
 {
     return executeCommand(sid, 'gethkrkomfort', ain, options).then(function(body) {
-        return Promise.resolve(api2temp(body));
+        return api2temp(body);
     });
 };
 
@@ -525,8 +526,8 @@ module.exports.getBatteryCharge = function(sid, ain, options)
 
         return httpRequest('/data.lua', req, options).then(function(body) {
             $ = cheerio.load(body);
-            var res = $('div>label:contains(Batterie)+span').first().text().replace(/[\s%]/g, '');
-            return Promise.resolve(res);
+            var battery = $('div>label:contains(Batterie)+span').first().text().replace(/[\s%]/g, '');
+            return isNaN(battery) ? null : battery;
         });
     });
 };
@@ -540,7 +541,7 @@ module.exports.getBatteryCharge = function(sid, ain, options)
 module.exports.getGuestWlan = function(sid, options)
 {
     return executeCommand(sid, null, null, options, '/wlan/guest_access.lua?0=0').then(function(body) {
-        return Promise.resolve(parseHTML(body));
+        return parseHTML(body);
     });
 };
 
@@ -577,7 +578,7 @@ module.exports.setGuestWlan = function(sid, enable, options)
         };
 
         return httpRequest('/data.lua', req, options).then(function(body) {
-            return Promise.resolve(parseHTML(body));
+            return parseHTML(body);
         });
     });
 };
