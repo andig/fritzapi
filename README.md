@@ -97,9 +97,12 @@ fritz.getSessionID("user", "password").then(function(sid) {
 });
 ```
 
-Get the list of switch AINs using a custom Fritz!Box address:
+Get the list of switch AINs using a custom Fritz!Box address with self-signed certificate:
 ```js
-var options = { url:"192.168.178.1" };
+var options = {
+  url: "192.168.178.1",
+  strictSSL: false         // workaround DEPTH_ZERO_SELF_SIGNED_CERT SSL error
+};
 fritz.getSessionID("user", "password", options).then(function(sid) {
   console.log(sid);
 
