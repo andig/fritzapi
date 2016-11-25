@@ -15,7 +15,7 @@
 
 /* jshint esversion: 6, -W079 */
 var Promise = require('bluebird');
-var request = require('request').defaults({ strictSSL: false }); // be less strict about SSL errors
+var request = require('request');
 var cheerio = require('cheerio');
 var parser = require('xml2json-light');
 var extend = require('extend');
