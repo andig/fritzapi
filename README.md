@@ -99,11 +99,10 @@ fritz.getSessionID("user", "password").then(function(sid) {
 
 Get the list of switch AINs using a custom Fritz!Box address with self-signed certificate:
 ```js
-var options = {
+fritz.getSessionID("user", "password", {
   url: "192.168.178.1",
   strictSSL: false         // workaround DEPTH_ZERO_SELF_SIGNED_CERT SSL error
-};
-fritz.getSessionID("user", "password", options).then(function(sid) {
+}).then(function(sid) {
   console.log(sid);
 
   // note that the options/url need be carries through every single api call
