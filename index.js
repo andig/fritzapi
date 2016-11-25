@@ -166,6 +166,13 @@ Fritz.prototype = {
 var defaults = { url: 'http://fritz.box' };
 
 /**
+ * Check if numeric value
+ */
+function isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+/**
  * Execute HTTP request that honors failed/invalid login
  */
 function httpRequest(path, req, options)
@@ -429,7 +436,7 @@ module.exports.getSwitchPower = function(sid, ain, options)
 {
     return executeCommand(sid, 'getswitchpower', ain, options).then(function(body) {
         var power = parseFloat(body);
-        return power === null ? null : power / 1000; // W
+        return isNumeric(power) ? power / 1000 : null; // W
     });
 };
 
@@ -527,7 +534,7 @@ module.exports.getBatteryCharge = function(sid, ain, options)
         return httpRequest('/data.lua', req, options).then(function(body) {
             $ = cheerio.load(body);
             var battery = $('div>label:contains(Batterie)+span').first().text().replace(/[\s%]/g, '');
-            return isNaN(battery) ? null : battery;
+            return isNumeric(battery) ? battery : null;
         });
     });
 };
@@ -552,10 +559,10 @@ module.exports.setGuestWlan = function(sid, enable, options)
     var settings = enable instanceof Object
         ? Promise.resolve(enable)
         : executeCommand(sid, null, null, options, '/wlan/guest_access.lua?0=0').then(function(body) {
-              return extend(parseHTML(body), {
-                  activate_guest_access: enable
-              });
-          });
+            return extend(parseHTML(body), {
+                activate_guest_access: enable
+            });
+        });
 
     return settings.then(function(settings) {
         // convert boolean to checkbox
