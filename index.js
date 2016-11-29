@@ -534,7 +534,7 @@ module.exports.getBatteryCharge = function(sid, ain, options)
         return httpRequest('/data.lua', req, options).then(function(body) {
             $ = cheerio.load(body);
             var battery = $('div>label:contains(Batterie)+span').first().text().replace(/[\s%]/g, '');
-            return isNumeric(battery) ? battery : null;
+            return isNumeric(battery) ? parseInt(battery, 10) : null;
         });
     });
 };
