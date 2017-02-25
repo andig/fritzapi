@@ -34,6 +34,13 @@ function Fritz(username, password, uri) {
     this.options = { url: uri || 'http://fritz.box' };
 }
 
+// functionbitmask
+Fritz.THERMOSTAT = module.exports.FUNCTION_THERMOSTAT;
+Fritz.ENERGYMETER = module.exports.FUNCTION_ENERGYMETER;
+Fritz.TEMPERATURESENSOR = module.exports.FUNCTION_TEMPERATURESENSOR;
+Fritz.OUTLET = module.exports.FUNCTION_OUTLET;
+Fritz.DECTREPEATER = module.exports.FUNCTION_DECTREPEATER;
+
 Fritz.prototype = {
     call: function(func) {
         var originalSID = this.sid;
@@ -472,7 +479,7 @@ module.exports.getThermostatList = function(sid, options)
     return deviceList.then(function(devices) {
         // get thermostats- right now they're only available via the XML api
         var thermostats = devices.filter(function(device) {
-            return device.productname == 'Comet DECT';
+            return device.functionbitmask & module.exports.FUNCTION_THERMOSTAT;
         }).map(function(device) {
             // fix ain
             return device.identifier.replace(/\s/g, '');
