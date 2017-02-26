@@ -40,7 +40,7 @@ For controlling AVM Fritz!DECT 200 devices the actuator identification number (A
 
 The Fritz!DECT 100 DECT repeater AIN does only appear in the `getDeviceList` output. It supports retrieving the repeaters temperature.
 
-### Comet DECT thermostat functions
+### Fritz!DECT 300 and CometDECT thermostat functions
 
 Thermostat functions are only available as of FritzOS 6.36
 
@@ -52,7 +52,7 @@ Thermostat functions are only available as of FritzOS 6.36
 - Get battery charge status `getBatteryCharge`
 
 
-### Wlan functions
+### WLAN functions
 
 - Get the guest wlan settings `getGuestWlan`
 - Set the guest wlan `setGuestWlan`
@@ -61,7 +61,7 @@ Thermostat functions are only available as of FritzOS 6.36
 
 `getGuestWlan` returns a structure containing all wifi settings found in the Fritz!Box UI. The `setGuestWlan` function accepts either a settings structure such as this or a single boolean value.
 
-All functions have been tested on FritzOS 6.20/6.36/6.51 using the Fritz!Box 7390. The WLAN functions may be less stable.
+All functions have been tested on FritzOS 6.20/6.36/6.51 using the Fritz!Box 7390 and on FritzOS 6.50 on Fritz!Box 6490. The WLAN functions may be less stable.
 
 
 ## Installation
@@ -74,6 +74,8 @@ npm install fritzapi
 ## Usage
 
 ### Object-oriented interface
+
+The object-oriented interface is the recommended way of using fritzapi.
 
 Get the list of switch AINs using a customer Fritz!Box address:
 ```js
@@ -113,6 +115,8 @@ fritz.getSessionID("user", "password", {
 });
 ```
 
+**Note** The functional interface may be deprecated in a future version of the library.
+
 
 ## AHA HTTP Interface Documentation
 
@@ -123,9 +127,8 @@ http://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AHA-HTTP-Inter
 
 Thanks to:
 
+* AVM for providing free test devices and the AHA-HTTP interface document
+* EUROtronic Technology GmbH for providing free CometDECT thermostat sample
 * nischelwitzer for the basic js implementation (https://github.com/nischelwitzer/smartfritz)
 * steffen.timm for the basic communication function
 * thk4711 for the FRITZ!DECT 200 codes
-* AVM for providing the good AHA-HTTP interface document
-* EUROtronic Technology GmbH for providing free CometDECT thermostat sample
-* AVM for providing free FRITZ!Powerline 546E WLAN set
