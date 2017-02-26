@@ -1,69 +1,146 @@
 /**
  * fritzapi - Fritz goes smartHome
  *
- * AVM SmartHome nodeJS Control - for AVM Fritz!Box and Dect200 Devices
+ * AVM SmartHome nodeJS Control - for AVM Fritz!Box and Dect Devices
  *
  * @author Andreas Goetz <cpuidle@gmx.de>
  */
 
-var fritz = require('./index.js');
+var Fritz = require('./index.js').Fritz,
+    commandLineArgs = require('command-line-args'),
+    getUsage = require('command-line-usage');
 
-// NOTE: options only needs to be passed to each fritz function call if the Fritz!Box is not
-//       reachable at http://fritz.box
+// utility function to sequentialize promises
+function sequence(promises) {
+  var result = Promise.resolve();
+  promises.forEach(function(promise,i) {
+    result = result.then(promise);
+  });
+  return result;
+}
 
-var options = {
-    // "url": URL
-};
-
-var username = username;
-var password = password;
-
-
-fritz.getSessionID(username, password, options).then(function(sid) {
-    console.log("SID: " + sid);
-
-    // display switch information
-    fritz.getSwitchList(sid, options).then(function(switches) {
-        console.log("Switches: " + switches);
-
-        if (switches.length) {
-            fritz.getSwitchName(sid, switches[0], options).then(function(name) {
-                console.log("Switch name [" + switches[0] + "]: " + name);
-
-                fritz.getSwitchPresence(sid, switches[0], options).then(function(presence) {
-                    console.log("Switch presence [" + switches[0] + "]: " + presence);
-
-                    fritz.getSwitchState(sid, switches[0], options).then(function(state) {
-                        console.log("Switch state [" + switches[0] + "]: " + state);
-                    });
-
-                    fritz.getTemperature(sid, switches[0], options).then(function(temp) {
-                        console.log("Switch temperature [" + switches[0] + "]: " + temp + "°C");
-                    });
-                });
-            });
-        }
-    });
-
-    // display thermostat information
-    fritz.getThermostatList(sid, options).then(function(thermostats) {
-        console.log("Thermostats: " + thermostats);
-
-        if (thermostats.length) {
-            fritz.getTemperature(sid, thermostats[0], options).then(function(temp) {
-                console.log("Thermostat temperature [" + thermostats[0] + "]: " + temp + '°C');
-            });
-
-            fritz.getTempTarget(sid, thermostats[0], options).then(function(temp) {
-                console.log("Get Target temperature [" + thermostats[0] + "]: " + temp + '°C');
-            });
-
-            fritz.setTempTarget(sid, thermostats[0], 22.0, options).then(function(temp) {
-                console.log("Set Target temperature [" + thermostats[0] + "]: " + temp + '°C');
-            });
-        }
-    });
-})
-.catch(function(error) {
+function errorHandler(error) {
+  if (error == "0000000000000000")
+    console.error("Did not get session id- invalid username or password?")
+  else
     console.error(error);
-});
+}
+
+// display switch information
+function switches() {
+  return fritz.getSwitchList().then(function(switches) {
+    console.log("Switches: " + switches + "\n");
+
+    return sequence(switches.map(function(sw) {
+      return function() {
+        return sequence([
+          function() {
+            return fritz.getSwitchName(sw).then(function(name) {
+              console.log("[" + sw + "] " + name);
+            });
+          },
+          function() {
+            return fritz.getSwitchPresence(sw).then(function(presence) {
+              console.log("[" + sw + "] presence: " + presence);
+            });
+          },
+          function() {
+            return fritz.getSwitchState(sw).then(function(state) {
+              console.log("[" + sw + "] state: " + state);
+            });
+          },
+          function() {
+            return fritz.getTemperature(sw).then(function(temp) {
+              console.log("[" + sw + "] temp: " + temp + "°C\n");
+            });
+          }
+        ]);
+      }
+    }));
+  })
+}
+
+// display thermostat information
+function thermostats() {
+  return fritz.getThermostatList().then(function(thermostats) {
+    console.log("Thermostats: " + thermostats + "\n");
+
+    return sequence(thermostats.map(function(thermostat) {
+      return function() {
+        return sequence([
+          // there is no native getThermostatName function- use getDevice instead
+          function() {
+            return fritz.getDevice(thermostat).then(function(device) {
+              console.log("[" + thermostat + "] " + device.name);
+            })       
+          },
+          function() {
+            return fritz.getTemperature(thermostat).then(function(temp) {
+              console.log("[" + thermostat + "] temp " + temp + "°C");
+            })
+          },
+          function() {
+            return fritz.getTempTarget(thermostat).then(function(temp) {
+              console.log("[" + thermostat + "] target temp " + temp + "°C\n");
+            })
+          }
+        ]);
+      }
+    }));
+  })
+}
+
+// display debug information
+function debug() {
+  return fritz.getDeviceList().then(function(devices) {
+    console.log("Raw devices\n");
+    console.log(devices);
+  });
+}
+
+// -- main --
+
+const cmdOptionsDefinition = [
+  { name: 'username', alias: 'u', type: String },
+  { name: 'password', alias: 'p', type: String },
+  { name: 'types', alias: 't', type: String, multiple: true, description: 'switches|thermostats|debug, default is all, multiple possible' },
+  { name: 'url', type: String },
+  { name: 'help', alias: 'h', type: Boolean }
+];
+
+const cmdOptions = commandLineArgs(cmdOptionsDefinition);
+
+if (cmdOptions.username === undefined || cmdOptions.help) {
+  const sections = [{
+    header: 'Example App',
+    content: 'A simple app demonstrating the fritzapi functions.'
+  }, {
+    header: 'Options',
+    optionList: cmdOptionsDefinition
+  }];
+  console.log(getUsage(sections));
+  return;
+}
+
+// parse options
+var fritz = new Fritz(cmdOptions.username, cmdOptions.password||"", cmdOptions.url||""),
+    tasks = [];
+
+if (cmdOptions.types === undefined || cmdOptions.types.indexOf('switches') >= 0) {  
+  tasks.push(function() {
+    return switches();
+  });
+}
+if (cmdOptions.types === undefined || cmdOptions.types.indexOf('thermostats') >= 0) {  
+  tasks.push(function() {
+    return thermostats();
+  });
+}
+if (cmdOptions.types === undefined || cmdOptions.types.indexOf('debug') >= 0) {  
+  tasks.push(function() {
+    return debug();
+  });
+}
+
+// run tasks
+sequence(tasks).catch(errorHandler);
