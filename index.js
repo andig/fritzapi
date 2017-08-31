@@ -62,7 +62,7 @@ Fritz.prototype = {
                     if (this.sid === null || this.sid === originalSID) {
                         this.sid = null;
 
-                        return fritz.getSessionID(this.username, this.password, this.options).then(function(sid) {
+                        return module.exports.getSessionID(this.username, this.password, this.options).then(function(sid) {
                             // this session id is the most current one - so use it from now on
                             this.sid = sid;
 
