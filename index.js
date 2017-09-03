@@ -84,6 +84,10 @@ Fritz.prototype = {
         return this.sid;
     },
 
+    getOSVersion: function() {
+        return this.call(module.exports.getOSVersion);
+    },
+
     getDeviceListInfo: function() {
         return this.call(module.exports.getDeviceListInfo);
     },
@@ -349,6 +353,28 @@ module.exports.checkSession = function(sid, options)
 /*
  * General functions
  */
+
+// get OS version
+module.exports.getOSVersion = function(sid, options)
+{
+    var req = {
+        method: 'POST',
+        form: {
+            sid: sid,
+            xhr: 1,
+            page: 'overview'
+        }
+    };
+
+    /* jshint laxbreak:true */
+    return httpRequest('/data.lua', req, options).then(function(body) {
+        var json = JSON.parse(body);
+        var osVersion = json.data && json.data.fritzos && json.data.fritzos.nspver
+            ? json.data.fritzos.nspver
+            : null;
+        return osVersion;
+    });
+};
 
 // get detailed device information (XML)
 module.exports.getDeviceListInfo = function(sid, options)
