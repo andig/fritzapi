@@ -11,10 +11,11 @@ Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices.
 
 ### General functions
 
+- Get the Fritz!OS version `getOSVserion`
 - Get the session ID `getSessionID`
-- Get device list as XML `getDeviceListInfo` >FritzOS 6.10
-- Get device list `getDeviceList` >FritzOS 6.10
-- Get device `getDevice` >FritzOS 6.10
+- Get device list as XML `getDeviceListInfo` >Fritz!OS 6.10
+- Get device list `getDeviceList` >Fritz!OS 6.10
+- Get device `getDevice` >Fritz!OS 6.10
 - Get temperature `getTemperature` - polyfill
 - Get presence `getPresence` - polyfill
 
@@ -39,11 +40,11 @@ For controlling AVM Fritz!DECT 200 devices the actuator identification number (A
 
 ### Fritz!DECT 100 functions
 
-The Fritz!DECT 100 DECT repeater AIN does only appear in the `getDeviceList` output. It supports retrieving the repeaters temperature.
+The Fritz!DECT 100 DECT repeater AIN does only appear in the `getDeviceList` output. It supports retrieving the repeater's temperature.
 
 ### Fritz!DECT 300 and CometDECT thermostat functions
 
-Thermostat functions are only available as of FritzOS 6.36
+Thermostat functions are only available as of Fritz!OS 6.36
 
 - Get list `getThermostatList` - polyfill
 - Set target temperature `setTempTarget`, supports 'ON'/'OFF' to enable/disable thermostat
@@ -62,7 +63,7 @@ Thermostat functions are only available as of FritzOS 6.36
 
 `getGuestWlan` returns a structure containing all wifi settings found in the Fritz!Box UI. The `setGuestWlan` function accepts either a settings structure such as this or a single boolean value.
 
-All functions have been tested on FritzOS 6.20/6.36/6.51 using the Fritz!Box 7390 and on FritzOS 6.50 on Fritz!Box 6490. The WLAN functions may be less stable.
+All functions have been tested on Fritz!OS 6.20/6.36/6.51 using the Fritz!Box 7390 and on Fritz!OS 6.50 on Fritz!Box 6490. The WLAN functions may be less stable.
 
 
 ## Installation
