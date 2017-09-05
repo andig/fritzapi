@@ -104,6 +104,10 @@ Fritz.prototype = {
         return this.call(module.exports.getTemperature, ain);
     },
 
+    getPresence: function(ain) {
+        return this.call(module.exports.getPresence, ain);
+    },
+
     getSwitchList: function() {
         return this.call(module.exports.getSwitchList);
     },
@@ -402,11 +406,11 @@ module.exports.getDevice = function(sid, ain, options)
         : module.exports.getDeviceList(sid, options);
 
     return deviceList.then(function(devices) {
-        var dev = devices.find(function(device) {
+        var device = devices.find(function(device) {
             return device.identifier.replace(/\s/g, '') == ain;
         });
 
-        return dev || Promise.reject();
+        return device || Promise.reject();
     });
 };
 
@@ -415,6 +419,14 @@ module.exports.getTemperature = function(sid, ain, options)
 {
     return executeCommand(sid, 'gettemperature', ain, options).then(function(body) {
         return parseFloat(body) / 10; // °C
+    });
+};
+
+// get presence from deviceListInfo
+module.exports.getPresence = function(sid, ain, options)
+{
+    return module.exports.getDevice(sid, ain, options).then(function(device) {
+        return !!device.presence;
     });
 };
 

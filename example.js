@@ -6,6 +6,8 @@
  * @author Andreas Goetz <cpuidle@gmx.de>
  */
 
+/* jshint esversion: 6 */
+
 var Fritz = require('./index.js').Fritz,
     commandLineArgs = require('command-line-args'),
     getUsage = require('command-line-usage');
@@ -21,7 +23,7 @@ function sequence(promises) {
 
 function errorHandler(error) {
   if (error == "0000000000000000")
-    console.error("Did not get session id- invalid username or password?")
+    console.error("Did not get session id- invalid username or password?");
   else
     console.error(error);
 }
@@ -51,13 +53,14 @@ function switches() {
           },
           function() {
             return fritz.getTemperature(sw).then(function(temp) {
-              console.log("[" + sw + "] temp: " + temp + "°C\n");
+              temp = isNaN(temp) ? '-' : temp + "°C";
+              console.log("[" + sw + "] temp: " + temp + "\n");
             });
           }
         ]);
       }
     }));
-  })
+  });
 }
 
 // display thermostat information
@@ -72,22 +75,24 @@ function thermostats() {
           function() {
             return fritz.getDevice(thermostat).then(function(device) {
               console.log("[" + thermostat + "] " + device.name);
-            })       
+            });       
           },
           function() {
             return fritz.getTemperature(thermostat).then(function(temp) {
+              temp = isNaN(temp) ? '-' : temp + "°C";
               console.log("[" + thermostat + "] temp " + temp + "°C");
-            })
+            });
           },
           function() {
             return fritz.getTempTarget(thermostat).then(function(temp) {
+              temp = isNaN(temp) ? '-' : temp + "°C";
               console.log("[" + thermostat + "] target temp " + temp + "°C\n");
-            })
+            });
           }
         ]);
-      }
+      };
     }));
-  })
+  });
 }
 
 // display debug information
@@ -126,17 +131,17 @@ if (cmdOptions.username === undefined || cmdOptions.help) {
 var fritz = new Fritz(cmdOptions.username, cmdOptions.password||"", cmdOptions.url||""),
     tasks = [];
 
-if (cmdOptions.types === undefined || cmdOptions.types.indexOf('switches') >= 0) {  
+if (cmdOptions.types === undefined || cmdOptions.types.indexOf('switches') >= 0) {
   tasks.push(function() {
     return switches();
   });
 }
-if (cmdOptions.types === undefined || cmdOptions.types.indexOf('thermostats') >= 0) {  
+if (cmdOptions.types === undefined || cmdOptions.types.indexOf('thermostats') >= 0) {
   tasks.push(function() {
     return thermostats();
   });
 }
-if (cmdOptions.types === undefined || cmdOptions.types.indexOf('debug') >= 0) {  
+if (cmdOptions.types === undefined || cmdOptions.types.indexOf('debug') >= 0) {
   tasks.push(function() {
     return debug();
   });
