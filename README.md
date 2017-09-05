@@ -16,6 +16,7 @@ Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices.
 - Get device list `getDeviceList` >FritzOS 6.10
 - Get device `getDevice` >FritzOS 6.10
 - Get temperature `getTemperature` - polyfill
+- Get presence `getPresence` - polyfill
 
 **Note**
 
@@ -116,6 +117,72 @@ fritz.getSessionID("user", "password", {
 ```
 
 **Note** The functional interface may be deprecated in a future version of the library.
+
+
+## Device details
+
+For sake of reference bolow is the output of `getDeviceList` as returned for the various Fritz devices I'm having around. These definitions remain cached by the Fritz!Box even if the device is no longer connected. The device presence is indicated by the `present` attribute.
+
+### Powerline
+
+    { identifier: '34:31:C4:DB:F6:C7',
+      id: '20000',
+      functionbitmask: '640',
+      fwversion: '06.20',
+      manufacturer: 'AVM',
+      productname: 'FRITZ!Powerline 546E',
+      present: '0',
+      name: 'FRITZ!Powerline 546E',
+      switch: { state: '', mode: '', lock: '' },
+      powermeter: { power: '', energy: '' } }
+
+### Outlets
+
+    { identifier: '08761 0103568',
+      id: '16',
+      functionbitmask: '640',
+      fwversion: '03.59',
+      manufacturer: 'AVM',
+      productname: 'FRITZ!DECT 200',
+      present: '0',
+      name: 'FRITZ!DECT 200 #1',
+      switch: { state: '', mode: '', lock: '' },
+      powermeter: { power: '', energy: '' } }
+
+    { identifier: '11657 0031825',    
+      id: '18',
+      functionbitmask: '640',
+      fwversion: '03.67',
+      manufacturer: 'AVM',
+      productname: 'FRITZ!DECT 210',
+      present: '0',
+      name: 'FRITZ!DECT 210 #3',
+      switch: { state: '', mode: '', lock: '' },
+      powermeter: { power: '', energy: '' } }
+
+### DECT Repeater
+
+    { identifier: '11657 0002527',
+      id: '20',
+      functionbitmask: '1024',
+      fwversion: '03.64',
+      manufacturer: 'AVM',
+      productname: 'FRITZ!DECT Repeater 100',
+      present: '0',
+      name: 'FRITZ!DECT Rep 100 #5' }
+
+### Thermostats
+
+    { identifier: '10971 0195784',
+      id: '17',
+      functionbitmask: '320',
+      fwversion: '03.66',
+      manufacturer: 'AVM',
+      productname: 'Comet DECT',
+      present: '0',
+      name: 'Comet DECT',
+      temperature: { celsius: '', offset: '' },
+      hkr: { tist: '', tsoll: '', absenk: '', komfort: '' } }
 
 
 ## AHA HTTP Interface Documentation

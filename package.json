@@ -1,6 +1,6 @@
 {
   "name": "fritzapi",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "author": "Andreas Goetz <cpuidle@gmx.de>",
   "description": "Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices",
   "homepage": "https://github.com/andig/fritzapi",
