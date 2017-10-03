@@ -1,7 +1,15 @@
-deploy: 
-  provider: npm
-  api_key: 
-    secure: m2fWAdfhNBA6ehwAi/LdgAI1fq3+mOQtSW0Q6CNUEPmt56oLteksACPdrcRYit/SuERPT7SOC4sXvKA4qgyk4cQuKMd0sqZ+WaF3qJn25UcCDVAhXgMeA0zdAMaHUGPUexkNdP44S6zi8PLzAT7Vd+z9nfuxVXbK1LHo1nXKSYY=
-  email: cpuidle@gmx.de
+# travis workflow:
+# - static code test (before_install)
+# - unit test after build (before_script)
+# - run code coverage after build
+# 2do: static code test executed twice...
+
 language: node_js
-sudo: false
+node_js:
+  - "8"
+  - "6"
+  - "4"
+
+before_install: npm run pretest
+before_script: npm test
+after_success: npm run coverage
