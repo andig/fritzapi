@@ -13,18 +13,13 @@ DECTREPEATER       === FUNCTION_DECTREPEATER        = 1 << 10; // AVM DECT Repea
 
 */
 
-const sinon = require('sinon');
+const chai = require('chai')
+  ,expect = chai.expect;
+  
+const FritzF = require('../index'); //functional API
+const FritzO = FritzF.Fritz; //object API
 
-var chai = require('chai')
-  ,expect = chai.expect
-  ,should = chai.should();
-
-const fs = require('fs'); //required for read mock xml
-
-var FritzF = require('../index'); //functional API
-var FritzO = FritzF.Fritz; //object API
-
-var fritzO;
+var fritzO; //object API test object instance
 
 describe('bitfunctions', () => {
     describe('functional-api', () => {
@@ -56,8 +51,6 @@ describe('bitfunctions', () => {
     describe('oo-api', () => {
         beforeEach(() => {
             fritzO = new FritzF.Fritz("user","pwd","url");
-            var fritzO2 = new FritzF.Fritz("user","pwd","url");
-            var fritz3 = new FritzF.Fritz("user","pwd","url");
         });
         afterEach(() => {
             fritzO = null;
@@ -69,19 +62,34 @@ describe('bitfunctions', () => {
             expect(() => {fritzO.ALARM = 42}).to.throw(TypeError); //should be readOnly
         });
         it('THERMOSTAT', () => {
-            expect(FritzO.THERMOSTAT).to.be.equal(FritzF.FUNCTION_THERMOSTAT);
+            expect(fritzO.THERMOSTAT).to.be.equal(FritzF.FUNCTION_THERMOSTAT);
+            delete fritzO.THERMOSTAT;
+            expect(fritzO.THERMOSTAT).to.be.equal(FritzF.FUNCTION_THERMOSTAT);
+            expect(() => {fritzO.THERMOSTAT = 42}).to.throw(TypeError);
         });
         it('ENERGYMETER', () => {
-            expect(FritzO.ENERGYMETER).to.be.equal(FritzF.FUNCTION_ENERGYMETER);
+            expect(fritzO.ENERGYMETER).to.be.equal(FritzF.FUNCTION_ENERGYMETER);
+            delete fritzO.ENERGYMETER;
+            expect(fritzO.ENERGYMETER).to.be.equal(FritzF.FUNCTION_ENERGYMETER);
+            expect(() => {fritzO.ENERGYMETER = 42}).to.throw(TypeError);
         });
         it('TEMPERATURESENSOR', () => {
-            expect(FritzO.TEMPERATURESENSOR).to.be.equal(FritzF.FUNCTION_TEMPERATURESENSOR);
+            expect(fritzO.TEMPERATURESENSOR).to.be.equal(FritzF.FUNCTION_TEMPERATURESENSOR);
+            delete fritzO.TEMPERATURESENSOR;
+            expect(fritzO.TEMPERATURESENSOR).to.be.equal(FritzF.FUNCTION_TEMPERATURESENSOR);
+            expect(() => {fritzO.TEMPERATURESENSOR = 42}).to.throw(TypeError);
         });
         it('OUTLET', () => {
-            expect(FritzO.OUTLET).to.be.equal(FritzF.FUNCTION_OUTLET);
+            expect(fritzO.OUTLET).to.be.equal(FritzF.FUNCTION_OUTLET);
+            delete fritzO.OUTLET;
+            expect(fritzO.OUTLET).to.be.equal(FritzF.FUNCTION_OUTLET);
+            expect(() => {fritzO.OUTLET = 42}).to.throw(TypeError);
         });
         it('DECTREPEATER', () => {
-            expect(FritzO.DECTREPEATER).to.be.equal(FritzF.FUNCTION_DECTREPEATER);
+            expect(fritzO.DECTREPEATER).to.be.equal(FritzF.FUNCTION_DECTREPEATER);
+            delete fritzO.DECTREPEATER;
+            expect(fritzO.DECTREPEATER).to.be.equal(FritzF.FUNCTION_DECTREPEATER);
+            expect(() => {fritzO.DECTREPEATER = 42}).to.throw(TypeError);
         });
     });
 });
