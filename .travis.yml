@@ -1,6 +1,5 @@
 # travis workflow:
-# - static code test (before_install)
-# - unit test after build (before_script)
+# - static code + unit test after build (before_script)
 # - run code coverage after build
 # 2do: static code test executed twice...
 
@@ -10,6 +9,5 @@ node_js:
   - "6"
   - "4"
 
-before_install: npm run pretest
 before_script: npm test
 after_success: npm run coverage
