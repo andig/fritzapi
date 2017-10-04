@@ -32,14 +32,15 @@ function Fritz(username, password, uri) {
     this.username = username;
     this.password = password;
     this.options = { url: uri || 'http://fritz.box' };
-}
 
-// functionbitmask
-Fritz.THERMOSTAT = module.exports.FUNCTION_THERMOSTAT;
-Fritz.ENERGYMETER = module.exports.FUNCTION_ENERGYMETER;
-Fritz.TEMPERATURESENSOR = module.exports.FUNCTION_TEMPERATURESENSOR;
-Fritz.OUTLET = module.exports.FUNCTION_OUTLET;
-Fritz.DECTREPEATER = module.exports.FUNCTION_DECTREPEATER;
+    //bitfunctions hidden, unchangable to prototype
+    if (!Fritz.prototype.ALARM)             { Object.defineProperty( Fritz.prototype, "ALARM",             {value: module.exports.FUNCTION_ALARM,             writable: false}); }
+    if (!Fritz.prototype.THERMOSTAT)        { Object.defineProperty( Fritz.prototype, "THERMOSTAT",        {value: module.exports.FUNCTION_THERMOSTAT,        writable: false}); }
+    if (!Fritz.prototype.ENERGYMETER)       { Object.defineProperty( Fritz.prototype, "ENERGYMETER",       {value: module.exports.FUNCTION_ENERGYMETER,       writable: false}); }
+    if (!Fritz.prototype.TEMPERATURESENSOR) { Object.defineProperty( Fritz.prototype, "TEMPERATURESENSOR", {value: module.exports.FUNCTION_TEMPERATURESENSOR, writable: false}); }
+    if (!Fritz.prototype.OUTLET)            { Object.defineProperty( Fritz.prototype, "OUTLET",            {value: module.exports.FUNCTION_OUTLET,            writable: false}); }
+    if (!Fritz.prototype.DECTREPEATER)      { Object.defineProperty( Fritz.prototype, "DECTREPEATER",      {value: module.exports.FUNCTION_DECTREPEATER,      writable: false}); }
+}
 
 Fritz.prototype = {
     call: function(func) {
@@ -309,6 +310,7 @@ module.exports.MIN_TEMP = MIN_TEMP;
 module.exports.MAX_TEMP = MAX_TEMP;
 
 // functions bitmask
+module.exports.FUNCTION_ALARM               = 1 << 4;  // Alarm Sensor
 module.exports.FUNCTION_THERMOSTAT          = 1 << 6;  // Comet DECT, Heizkostenregler
 module.exports.FUNCTION_ENERGYMETER         = 1 << 7;  // Energie Messgerät
 module.exports.FUNCTION_TEMPERATURESENSOR   = 1 << 8;  // Temperatursensor

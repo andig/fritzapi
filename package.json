@@ -1,6 +1,6 @@
 {
   "name": "fritzapi",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "author": "Andreas Goetz <cpuidle@gmx.de>",
   "description": "Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices",
   "homepage": "https://github.com/andig/fritzapi",
@@ -13,6 +13,10 @@
     {
       "name": "nischi.at",
       "url": "http://www.nischelwitzer.at"
+    },
+    {
+      "name": "Danny Falss",
+      "email": "github@falss.de"
     }
   ],
   "keywords": [
@@ -36,7 +40,9 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/jshint/bin/jshint index.js"
+    "pretest": "node_modules/jshint/bin/jshint index.js",
+    "test": "NODE_ENV=test mocha './test/**/*.spec.js'",
+    "coverage": "istanbul cover _mocha"
   },
   "dependencies": {
     "bluebird": "^3.0.2",
@@ -48,6 +54,9 @@
     "xml2json-light": "^1.0.4"
   },
   "devDependencies": {
-    "jshint": "^2.9.2"
+    "chai": "4.1.x",
+    "istanbul": "^0.4.5",
+    "jshint": "^2.9.2",
+    "mocha": "3.5.x"
   }
 }
