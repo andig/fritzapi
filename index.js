@@ -104,6 +104,10 @@ Fritz.prototype = {
     getTemperature: function(ain) {
         return this.call(module.exports.getTemperature, ain);
     },
+    
+    getTemperatureDevice: function(ain) {
+        return this.call(module.exports.getTemperatureDevice, ain);
+    },
 
     getPresence: function(ain) {
         return this.call(module.exports.getPresence, ain);
@@ -440,7 +444,15 @@ module.exports.getPresence = function(sid, ain, options)
 module.exports.getName = function(sid, ain, options)
 {
     return module.exports.getDevice(sid, ain, options).then(function(device) {
-        return !!device.name;
+        return device.name;
+    });
+};
+
+// get temperature from deviceListInfo for DECT100
+module.exports.getTemperatureDevice = function(sid, ain, options)
+{
+    return module.exports.getDevice(sid, ain, options).then(function(device) {
+        return (parseFloat(device.temperature.celsius) + parseFloat(device.temperature.offset))/10;
     });
 };
 
