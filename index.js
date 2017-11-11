@@ -108,6 +108,10 @@ Fritz.prototype = {
     getPresence: function(ain) {
         return this.call(module.exports.getPresence, ain);
     },
+    
+    getName: function(ain) {
+        return this.call(module.exports.getName, ain);
+    },
 
     getSwitchList: function() {
         return this.call(module.exports.getSwitchList);
@@ -432,6 +436,13 @@ module.exports.getPresence = function(sid, ain, options)
     });
 };
 
+// get name from deviceListInfo
+module.exports.getName = function(sid, ain, options)
+{
+    return module.exports.getDevice(sid, ain, options).then(function(device) {
+        return !!device.name;
+    });
+};
 
 /*
  * Switches
