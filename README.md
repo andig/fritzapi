@@ -13,7 +13,7 @@ Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices.
 
 - Get the Fritz!OS version `getOSVserion`
 - Get the session ID `getSessionID`
-- Get device list as XML `getDeviceListInfo` >Fritz!OS 6.10
+- Get device list as XML `getDeviceListInfos` >Fritz!OS 6.10
 - Get device list `getDeviceList` >Fritz!OS 6.10
 - Get device `getDevice` >Fritz!OS 6.10
 - Get temperature `getTemperature` - polyfill
@@ -22,6 +22,9 @@ Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices.
 **Note**
 
 `getTemperature` is not available on the FRITZ!Powerline 546E WLAN set and will always return `NaN`.
+
+`getDeviceListInfos` was named `getDeviceListInfo` in earlier versions. For consistency with the official Fritz!Box API the name has been changed. The `getDeviceListInfo` name is deprecated and will be removed in a future release. 
+In general, use of `getDeviceListInfos` is discouraged as the equivalent `getDeviceList` function which returns an object interface instead of XML is easier to use.
 
 ### Fritz!DECT 200 and 210 outlet functions (includes FRITZ!Powerline 546E)
 

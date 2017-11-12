@@ -93,6 +93,10 @@ Fritz.prototype = {
         return this.call(module.exports.getDeviceListInfo);
     },
 
+    getDeviceListInfos: function() {
+        return this.call(module.exports.getDeviceListInfos);
+    },
+
     getDeviceList: function() {
         return this.call(module.exports.getDeviceList);
     },
@@ -383,15 +387,22 @@ module.exports.getOSVersion = function(sid, options)
 };
 
 // get detailed device information (XML)
-module.exports.getDeviceListInfo = function(sid, options)
+module.exports.getDeviceListInfos = function(sid, options)
 {
     return executeCommand(sid, 'getdevicelistinfos', null, options);
+};
+
+// @deprecated
+module.exports.getDeviceListInfo = function(sid, options)
+{
+    console.warn('`getDeviceListInfo` is deprecated. Use `getDeviceListInfos` instead.');
+    return module.exports.getDeviceListInfos(sid, options);
 };
 
 // get device list
 module.exports.getDeviceList = function(sid, options)
 {
-    return module.exports.getDeviceListInfo(sid, options).then(function(devicelistinfo) {
+    return module.exports.getDeviceListInfos(sid, options).then(function(devicelistinfo) {
         var devices = parser.xml2json(devicelistinfo);
         // extract devices as array
         devices = [].concat((devices.devicelist || {}).device || []);
