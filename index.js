@@ -405,7 +405,11 @@ module.exports.getDeviceList = function(sid, options)
     return module.exports.getDeviceListInfos(sid, options).then(function(devicelistinfo) {
         var devices = parser.xml2json(devicelistinfo);
         // extract devices as array
-        devices = [].concat((devices.devicelist || {}).device || []);
+        devices = [].concat((devices.devicelist || {}).device || []).map(function(device) {
+            // remove spaces in AINs
+            device.identifier = device.identifier.replace(/\s/g, '');
+            return device;
+        });
         return devices;
     });
 };
