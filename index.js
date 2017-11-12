@@ -381,7 +381,7 @@ module.exports.getOSVersion = function(sid, options)
         var json = JSON.parse(body);
         var osVersion = json.data && json.data.fritzos && json.data.fritzos.nspver
             ? json.data.fritzos.nspver
-            : Promise.reject();
+            : null;
         return osVersion;
     });
 };
