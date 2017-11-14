@@ -16,6 +16,7 @@ Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices.
 - Get the session ID `getSessionID`
 - Get device list as XML `getDeviceListInfos` >Fritz!OS 6.10
 - Get device list `getDeviceList` >Fritz!OS 6.10
+- Get device list with filter criteria applied `getDeviceListFiltered` >Fritz!OS 6.10
 - Get device `getDevice` >Fritz!OS 6.10
 - Get temperature `getTemperature` - polyfill
 - Get presence `getPresence` - polyfill

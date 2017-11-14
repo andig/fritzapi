@@ -102,6 +102,10 @@ Fritz.prototype = {
         return this.call(module.exports.getDeviceList);
     },
 
+    getDeviceListFiltered: function(filter) {
+        return this.call(module.exports.getDeviceListFiltered, filter);
+    },
+
     getDevice: function(ain) {
         return this.call(module.exports.getDevice, ain);
     },
@@ -415,8 +419,8 @@ module.exports.getDeviceList = function(sid, options)
     });
 };
 
-// get single device
-module.exports.getDevice = function(sid, ain, options)
+// get device list by filter criteria
+module.exports.getDeviceListFiltered = function(sid, filter, options)
 {
     /* jshint laxbreak:true */
     var deviceList = options && options.deviceList
@@ -424,11 +428,24 @@ module.exports.getDevice = function(sid, ain, options)
         : module.exports.getDeviceList(sid, options);
 
     return deviceList.then(function(devices) {
-        var device = devices.find(function(device) {
-            return device.identifier.replace(/\s/g, '') == ain;
+        return devices.filter(function(device) {
+            return Object.keys(filter).every(function(key) {
+                /* jshint laxbreak:true */
+                return key === 'functionbitmask'
+                    ? device.functionbitmask & filter[key]
+                    : device[key] == filter[key];
+            });
         });
+    });
+};
 
-        return device || Promise.reject();
+// get single device
+module.exports.getDevice = function(sid, ain, options)
+{
+    return module.exports.getDeviceListFiltered(sid, {
+        identifier: ain
+    }, options).then(function(devices) {
+        return devices.length ? devices[0] : Promise.reject();
     });
 };
 
@@ -527,21 +544,10 @@ module.exports.getSwitchName = function(sid, ain, options)
 // get the thermostat list
 module.exports.getThermostatList = function(sid, options)
 {
-    /* jshint laxbreak:true */
-    var deviceList = options && options.deviceList
-        ? Promise.resolve(options.deviceList)
-        : module.exports.getDeviceList(sid, options);
-
-    return deviceList.then(function(devices) {
-        // get thermostats- right now they're only available via the XML api
-        var thermostats = devices.filter(function(device) {
-            return device.functionbitmask & module.exports.FUNCTION_THERMOSTAT;
-        }).map(function(device) {
-            // fix ain
-            return device.identifier.replace(/\s/g, '');
-        });
-
-        return thermostats;
+    return module.exports.getDeviceListFiltered(sid, {
+        functionbitmask: module.exports.FUNCTION_THERMOSTAT
+    }).map(function(device) {
+        return device.identifier;
     });
 };
 
