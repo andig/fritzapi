@@ -114,11 +114,29 @@ Fritz.prototype = {
     getTemperature: function(ain) {
         return this.call(module.exports.getTemperature, ain);
     },
+    
+    getTemperatureDevice: function(ain) {
+        return this.call(module.exports.getTemperatureDevice, ain);
+    },
 
     getPresence: function(ain) {
         return this.call(module.exports.getPresence, ain);
     },
-
+    
+    getName: function(ain) {
+        return this.call(module.exports.getName, ain);
+    },
+    
+    getRepeaterList: function() {
+        return this.call(module.exports.getRepeaterList);
+    },
+    getAlarmContactList: function() {
+        return this.call(module.exports.getAlarmContactList);
+    },
+    getAlarmState: function(ain) {
+        return this.call(module.exports.getAlarmState, ain);
+    },
+    
     getSwitchList: function() {
         return this.call(module.exports.getSwitchList);
     },
@@ -463,6 +481,81 @@ module.exports.getPresence = function(sid, ain, options)
 {
     return module.exports.getDevice(sid, ain, options).then(function(device) {
         return !!device.presence;
+    });
+};
+
+// get name from deviceListInfo
+module.exports.getName = function(sid, ain, options)
+{
+    return module.exports.getDevice(sid, ain, options).then(function(device) {
+        return device.name;
+    });
+};
+
+/*
+* DECT100
+*/
+
+// get temperature from deviceListInfo for DECT100
+module.exports.getTemperatureDevice = function(sid, ain, options)
+{
+    return module.exports.getDevice(sid, ain, options).then(function(device) {
+        return (parseFloat(device.temperature.celsius) + parseFloat(device.temperature.offset))/10;
+    });
+};
+
+
+
+// get the DECT100 list
+module.exports.getRepeaterList = function(sid, options)
+{
+    /* jshint laxbreak:true */
+    var deviceList = options && options.deviceList
+        ? Promise.resolve(options.deviceList)
+        : module.exports.getDeviceList(sid, options);
+
+    return deviceList.then(function(devices) {
+        // get DECT100- right now they're only available via the XML api
+        var repeater = devices.filter(function(device) {
+            return device.functionbitmask & module.exports.FUNCTION_DECTREPEATER;
+        }).map(function(device) {
+            // fix ain
+            return device.identifier.replace(/\s/g, '');
+        });
+
+        return repeater;
+    });
+};
+
+/*
+* Alarm Contacts
+*/
+
+// get the contact list
+module.exports.getAlarmContactList = function(sid, options)
+{
+    /* jshint laxbreak:true */
+    var deviceList = options && options.deviceList
+        ? Promise.resolve(options.deviceList)
+        : module.exports.getDeviceList(sid, options);
+
+    return deviceList.then(function(devices) {
+        // get contacts- right now they're only available via the XML api
+        var contacts = devices.filter(function(device) {
+            return device.functionbitmask & module.exports.FUNCTION_ALARM;
+        }).map(function(device) {
+            // fix ain
+            return device.identifier.replace(/\s/g, '');
+        });
+
+        return contacts;
+    });
+};
+// get contact alarm state from deviceListInfo
+module.exports.getAlarmState = function(sid, ain, options)
+{
+    return module.exports.getDevice(sid, ain, options).then(function(device) {
+        return !!device.alarm.state;
     });
 };
 
