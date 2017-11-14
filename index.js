@@ -10,7 +10,8 @@
  *
  * based on: Node2Fritz by steffen.timm on 05.12.13 for Fritz!OS > 05.50
  * and  thk4711 (code https://github.com/pimatic/pimatic/issues/38)
- * Documentation is at http://www.avm.de/de/Extern/files/session_id/AHA-HTTP-Interface.pdf
+ *
+ * AVM Documentation is at https://avm.de/service/schnittstellen/
  */
 
 /* jshint esversion: 6, -W079 */
@@ -523,7 +524,7 @@ module.exports.getSwitchName = function(sid, ain, options)
  * Thermostats
  */
 
-// get the switch list
+// get the thermostat list
 module.exports.getThermostatList = function(sid, options)
 {
     /* jshint laxbreak:true */
