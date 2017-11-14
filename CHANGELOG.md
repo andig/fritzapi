@@ -1,4 +1,11 @@
-## 0.9.6 
+## 0.9.7
+
+- renamed `getDeviceListInfo` to `getDeviceListInfos`
+- changed `getDeviceList` and `getDevice` to always return AINs without spaces. These AINs can directly be passed into the native Fritz!Box api functions.
+- added `getDeviceListFiltered` which takes a `filter` object to apply to the devices. Used internally for filtering by `functionbitmask`.
+
+## 0.9.6
+
 - bugfixed OO bitfunctions in object
 
 - moved jslint to pretest
@@ -13,12 +20,12 @@
 
 - **Breaking change**: SSL certificate check is now strict. This will break self-signed certificates that are typically used by AVM Fritz!Box. To connect via HTTPS to such a Fritz!Box add the `strictSSL: false` option:
 
-		fritz.getSessionID(username, password, {
-		    url: "https://...",
-		    strictSSL: false
-		}).then(function(sid) {
-			// ...
-		});
+	fritz.getSessionID(username, password, {
+		url: "https://...",
+		strictSSL: false
+	}).then(function(sid) {
+		// ...
+	});
 
 - changed `getSwitchPower` and `getBatteryCharge` to return `null` instead of 0 or empty if device is not connected
 
