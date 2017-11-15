@@ -1,4 +1,4 @@
-## 0.9.7
+## 0.10.0
 
 - renamed `getDeviceListInfo` to `getDeviceListInfos`
 - changed `getDeviceList` and `getDevice` to always return AINs without spaces. These AINs can directly be passed into the native Fritz!Box api functions.
