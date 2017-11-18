@@ -175,6 +175,10 @@ Fritz.prototype = {
         return this.call(module.exports.getBatteryCharge, ain);
     },
 
+    getWindowOpen: function(ain) {
+        return this.call(module.exports.getWindowOpen, ain);
+    },
+
     getGuestWlan: function() {
         return this.call(module.exports.getGuestWlan);
     },
@@ -241,39 +245,6 @@ function executeCommand(sid, command, ain, options, path)
         path += '&ain=' + ain;
 
     return httpRequest(path, {}, options);
-}
-
-/**
- * Parse guest WLAN form settings
- */
-function parseHTML(html)
-{
-    $ = cheerio.load(html);
-    var form = $('form');
-    var settings = {};
-
-    $('input', form).each(function(i, elem) {
-        var val;
-        var name = $(elem).attr('name');
-        if (!name) return;
-
-        switch ($(elem).attr('type')) {
-            case 'checkbox':
-                val = $(elem).attr('checked') == 'checked';
-                break;
-            default:
-                val = $(elem).val();
-        }
-        settings[name] = val;
-    });
-
-    $('select option[selected=selected]', form).each(function(i, elem) {
-        var val = $(elem).val();
-        var name = $(elem).parent().attr('name');
-        settings[name] = val;
-    });
-
-    return settings;
 }
 
 /*
@@ -610,16 +581,72 @@ module.exports.getBatteryCharge = function(sid, ain, options)
     });
 };
 
+module.exports.getWindowOpen = function(sid, ain, options)
+{
+    var dev = module.exports.getDevice(sid, ain, options),
+        req = httpRequest('/data.lua', {
+            method: 'POST',
+            form: {
+                sid: sid,
+                xhr: 1,
+                no_sidrenew: '',
+                page: 'sh',
+            }
+        }, options);
+
+    return Promise.join(dev, req, function(device, body) {
+        $ = cheerio.load(body);
+
+        var elems = $('td.iconrow[datalabel="' + device.name + '"] ~ td.temperature');
+        if (elems.length == 1) {
+            return $('img[src*=icon_window_open]', elems[0]).length == 1;
+        }
+
+        return false;
+    });
+};
+
 
 /*
  * WLAN
  */
 
+// Parse guest WLAN form settings
+function parseGuestWlanHTML(html)
+{
+    $ = cheerio.load(html);
+    var form = $('form');
+    var settings = {};
+
+    $('input', form).each(function(i, elem) {
+        var val;
+        var name = $(elem).attr('name');
+        if (!name) return;
+
+        switch ($(elem).attr('type')) {
+            case 'checkbox':
+                val = $(elem).attr('checked') == 'checked';
+                break;
+            default:
+                val = $(elem).val();
+        }
+        settings[name] = val;
+    });
+
+    $('select option[selected=selected]', form).each(function(i, elem) {
+        var val = $(elem).val();
+        var name = $(elem).parent().attr('name');
+        settings[name] = val;
+    });
+
+    return settings;
+}
+
 // get guest WLAN settings - not part of Fritz API
 module.exports.getGuestWlan = function(sid, options)
 {
     return executeCommand(sid, null, null, options, '/wlan/guest_access.lua?0=0').then(function(body) {
-        return parseHTML(body);
+        return parseGuestWlanHTML(body);
     });
 };
 
@@ -630,7 +657,7 @@ module.exports.setGuestWlan = function(sid, enable, options)
     var settings = enable instanceof Object
         ? Promise.resolve(enable)
         : executeCommand(sid, null, null, options, '/wlan/guest_access.lua?0=0').then(function(body) {
-            return extend(parseHTML(body), {
+            return extend(parseGuestWlanHTML(body), {
                 activate_guest_access: enable
             });
         });
@@ -656,7 +683,7 @@ module.exports.setGuestWlan = function(sid, enable, options)
         };
 
         return httpRequest('/data.lua', req, options).then(function(body) {
-            return parseHTML(body);
+            return parseGuestWlanHTML(body);
         });
     });
 };

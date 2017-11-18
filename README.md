@@ -59,7 +59,8 @@ Thermostat functions are only available as of Fritz!OS 6.36
 - Get target temperature `getTempTarget`
 - Get comfort temperature `getTempComfort`
 - Get night temperature `getTempNight`
-- Get battery charge status `getBatteryCharge`
+- Get battery charge `getBatteryCharge` (uses UI scraping, may be unstable)
+- Get window open `getWindowOpen` (uses UI scraping, may be unstable)
 
 
 ### WLAN functions

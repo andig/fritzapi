@@ -1,6 +1,6 @@
 {
   "name": "fritzapi",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "author": "Andreas Goetz <cpuidle@gmx.de>",
   "description": "Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices",
   "homepage": "https://github.com/andig/fritzapi",
@@ -27,9 +27,11 @@
     "Fritz Box",
     "Comet!DECT",
     "Comet DECT",
-    "Dect 100",
-    "Dect 200",
-    "Dect 210",
+    "Fritz!DECT 100",
+    "Fritz!DECT 200",
+    "Fritz!DECT 210",
+    "Fritz!DECT 300",
+    "Fritz!DECT 301",
     "SmartHome",
     "SmartFritz",
     "AHA"
