@@ -1,3 +1,15 @@
+## 0.10.3
+
+- expose temperature conversion helpers
+
+## 0.10.2
+
+- bugfix `getThermostatList` not relaying `options`
+
+## 0.10.1
+
+- added `getWindowOpen` polyfill
+
 ## 0.10.0
 
 - renamed `getDeviceListInfo` to `getDeviceListInfos`

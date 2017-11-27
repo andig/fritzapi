@@ -186,6 +186,12 @@ Fritz.prototype = {
     setGuestWlan: function(enable) {
         return this.call(module.exports.setGuestWlan, enable);
     },
+
+    /*
+     * Helper functions
+     */
+    api2temp: module.exports.api2temp,
+    temp2api: module.exports.temp2api
 };
 
 
@@ -285,6 +291,8 @@ function api2temp(param)
 
 // run command for selected device
 module.exports.executeCommand = executeCommand;
+module.exports.api2temp = api2temp;
+module.exports.temp2api = temp2api;
 
 // supported temperature range
 module.exports.MIN_TEMP = MIN_TEMP;
