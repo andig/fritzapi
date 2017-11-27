@@ -518,7 +518,7 @@ module.exports.getThermostatList = function(sid, options)
 {
     return module.exports.getDeviceListFiltered(sid, {
         functionbitmask: module.exports.FUNCTION_THERMOSTAT
-    }).map(function(device) {
+    }, options).map(function(device) {
         return device.identifier;
     });
 };
