@@ -72,6 +72,19 @@ Thermostat functions are only available as of Fritz!OS 6.36
 
 `getGuestWlan` returns a structure containing all wifi settings found in the Fritz!Box UI. The `setGuestWlan` function accepts either a settings structure such as this or a single boolean value.
 
+### LED status functions
+
+- Get the current LED status `getLEDStatus`
+- Set the LED status `setLEDStatus`
+
+**Note**
+
+`getLEDStatus` returns an object containing the String typed `led_display` property with following possible values, which can also  be passed as the `status` parameter to `setLEDStatus`:
+- `'0'` (on): the LEDs are always on and are showing the current status of the Fritz!Box (default).
+- `'1'` (on demand): the LEDs will automatically turn off after a few minutes and stay that way during normal operation. They will light up again in case of an error or a status event.
+- `'2'` (off): the LEDs are always off and will not show any status informations (even in the case of a Fritz!Box error).
+
+
 All functions have been tested on Fritz!OS 6.20/6.36/6.51 using the Fritz!Box 7390 and on Fritz!OS 6.50 on Fritz!Box 6490. The WLAN functions may be less stable.
 
 

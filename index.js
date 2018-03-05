@@ -187,6 +187,14 @@ Fritz.prototype = {
         return this.call(module.exports.setGuestWlan, enable);
     },
 
+    getLEDStatus: function() {
+        return this.call(module.exports.getLEDStatus);
+    },
+
+    setLEDStatus: function(enable) {
+        return this.call(module.exports.setLEDStatus, enable);
+    },
+
     /*
      * Helper functions
      */
@@ -693,5 +701,67 @@ module.exports.setGuestWlan = function(sid, enable, options)
         return httpRequest('/data.lua', req, options).then(function(body) {
             return parseGuestWlanHTML(body);
         });
+    });
+};
+
+/*
+ * LED status
+ */
+
+// Parse guest WLAN form settings
+function parseLEDStatusHTML(html)
+{
+    $ = cheerio.load(html);
+    var form = $('form');
+    var settings = {led_display: '1'}; // '1' if no radio button is checked
+
+    $('input', form).each(function(i, elem) {
+        var val;
+        var name = $(elem).attr('name');
+        if (!name) return;
+
+        switch ($(elem).attr('type')) {
+            case 'radio':
+                if ($(elem).attr('checked') === 'checked') settings[name] = $(elem).val();
+                break;
+            default:
+                settings[name] = $(elem).val();
+        }
+    });
+
+    return settings;
+}
+
+// get LED power status - not part of Fritz API, returns {sid, led_display: '0' | '1' | '2'}
+module.exports.getLEDStatus = function(sid, options)
+{
+    return executeCommand(sid, null, null, options, '/system/led_display.lua?0=0').then(function(body) {
+        return parseLEDStatusHTML(body);
+    });
+};
+
+// set LED power status - not part of Fritz API (status: '0' (on) | '1' (on demand) | '2' (off))
+ module.exports.setLEDStatus = function(sid, status, options)
+{
+    var req = {
+        method: 'POST',
+        form: {
+            led_display: status,
+            sid: sid,
+            xhr: 1,
+            no_sidrenew: '',
+            apply: '',
+            oldpage: '/system/led_display.lua'
+        }
+    };
+
+    return httpRequest('/system/led_display.lua', req, options).catch(function(err) {
+        // can't avoid redirect here, because the page doesn't officially exists anymore
+        if (err.response.statusCode === 303){
+            return executeCommand(sid, null, null, options, '/system/led_display.lua?0=0');
+        }
+        throw err;
+    }).then(function(body) {
+        return parseLEDStatusHTML(body);
     });
 };
