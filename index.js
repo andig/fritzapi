@@ -413,7 +413,7 @@ module.exports.getDeviceListFiltered = function(sid, filter, options)
                 /* jshint laxbreak:true */
                 return key === 'functionbitmask'
                     ? device.functionbitmask & filter[key]
-                    : device[key] == filter[key]; 
+                    : device[key] == filter[key];
             });
         });
     });
