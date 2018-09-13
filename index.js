@@ -34,13 +34,40 @@ function Fritz(username, password, uri) {
     this.password = password;
     this.options = { url: uri || 'http://fritz.box' };
 
-    //bitfunctions hidden, unchangable to prototype
-    if (!Fritz.prototype.ALARM)             { Object.defineProperty( Fritz.prototype, "ALARM",             {value: module.exports.FUNCTION_ALARM,             writable: false}); }
-    if (!Fritz.prototype.THERMOSTAT)        { Object.defineProperty( Fritz.prototype, "THERMOSTAT",        {value: module.exports.FUNCTION_THERMOSTAT,        writable: false}); }
-    if (!Fritz.prototype.ENERGYMETER)       { Object.defineProperty( Fritz.prototype, "ENERGYMETER",       {value: module.exports.FUNCTION_ENERGYMETER,       writable: false}); }
-    if (!Fritz.prototype.TEMPERATURESENSOR) { Object.defineProperty( Fritz.prototype, "TEMPERATURESENSOR", {value: module.exports.FUNCTION_TEMPERATURESENSOR, writable: false}); }
-    if (!Fritz.prototype.OUTLET)            { Object.defineProperty( Fritz.prototype, "OUTLET",            {value: module.exports.FUNCTION_OUTLET,            writable: false}); }
-    if (!Fritz.prototype.DECTREPEATER)      { Object.defineProperty( Fritz.prototype, "DECTREPEATER",      {value: module.exports.FUNCTION_DECTREPEATER,      writable: false}); }
+    // bitfunctions hidden, unchangable to prototype
+    defineProperty('HANFUN', module.exports.FUNCTION_HANFUN);
+    defineProperty('ALARM', module.exports.FUNCTION_ALARM);
+    defineProperty('THERMOSTAT', module.exports.FUNCTION_THERMOSTAT);
+    defineProperty('ENERGYMETER', module.exports.FUNCTION_ENERGYMETER);
+    defineProperty('TEMPERATURESENSOR', module.exports.FUNCTION_TEMPERATURESENSOR);
+    defineProperty('OUTLET', module.exports.FUNCTION_OUTLET);
+    defineProperty('DECTREPEATER', module.exports.FUNCTION_DECTREPEATER);
+    defineProperty('MICROPHONE', module.exports.FUNCTION_MICROPHONE);
+    defineProperty('HANFUN_UNIT', module.exports.FUNCTION_HANFUN_UNIT);
+
+    // HANFUN units
+    defineProperty('HANFUN_UNIT_SIMPLE_BUTTON', module.exports.HANFUN_UNIT_SIMPLE_BUTTON);
+    defineProperty('HANFUN_UNIT_SIMPLE_DETECTOR', module.exports.HANFUN_UNIT_SIMPLE_DETECTOR);
+    defineProperty('HANFUN_UNIT_DOOR_OPEN_CLOSE_DETECTOR', module.exports.HANFUN_UNIT_DOOR_OPEN_CLOSE_DETECTOR);
+    defineProperty('HANFUN_UNIT_WINDOW_OPEN_CLOSE_DETECTOR', module.exports.HANFUN_UNIT_WINDOW_OPEN_CLOSE_DETECTOR);
+    defineProperty('HANFUN_UNIT_MOTION_DETECTOR', module.exports.HANFUN_UNIT_MOTION_DETECTOR);
+    defineProperty('HANFUN_UNIT_FLOOD_DETECTOR', module.exports.HANFUN_UNIT_FLOOD_DETECTOR);
+    defineProperty('HANFUN_UNIT_GLAS_BREAK_DETECTOR', module.exports.HANFUN_UNIT_GLAS_BREAK_DETECTOR);
+    defineProperty('HANFUN_UNIT_VIBRATION_DETECTOR', module.exports.HANFUN_UNIT_VIBRATION_DETECTOR);
+
+    // HANFUN interfaces
+    defineProperty('HANFUN_INTERFACE_KEEP_ALIVE', module.exports.HANFUN_INTERFACE_KEEP_ALIVE);
+    defineProperty('HANFUN_INTERFACE_ALERT', module.exports.HANFUN_INTERFACE_ALERT);
+    defineProperty('HANFUN_INTERFACE_SIMPLE_BUTTON', module.exports.HANFUN_INTERFACE_SIMPLE_BUTTON);
+}
+
+function defineProperty(key, val) {
+    if (typeof Fritz.prototype[key] === undefined) {
+        Object.defineProperty( Fritz.prototype, key, {
+            value: val,
+            writable: false
+        });
+    }
 }
 
 Fritz.prototype = {
@@ -299,12 +326,30 @@ module.exports.MIN_TEMP = MIN_TEMP;
 module.exports.MAX_TEMP = MAX_TEMP;
 
 // functions bitmask
+module.exports.FUNCTION_HANFUN              = 1 << 0;  // HANFUN device
 module.exports.FUNCTION_ALARM               = 1 << 4;  // Alarm Sensor
 module.exports.FUNCTION_THERMOSTAT          = 1 << 6;  // Comet DECT, Heizkostenregler
 module.exports.FUNCTION_ENERGYMETER         = 1 << 7;  // Energie Messgerät
 module.exports.FUNCTION_TEMPERATURESENSOR   = 1 << 8;  // Temperatursensor
 module.exports.FUNCTION_OUTLET              = 1 << 9;  // Schaltsteckdose
 module.exports.FUNCTION_DECTREPEATER        = 1 << 10; // AVM DECT Repeater
+module.exports.FUNCTION_MICROPHONE          = 1 << 11; // Microphone
+module.exports.FUNCTION_HANFUN_UNIT         = 1 << 13; // HANFUN unit information
+
+// HANFUN units
+module.exports.HANFUN_UNIT_SIMPLE_BUTTON = 273;
+module.exports.HANFUN_UNIT_SIMPLE_DETECTOR = 512;
+module.exports.HANFUN_UNIT_DOOR_OPEN_CLOSE_DETECTOR = 513;
+module.exports.HANFUN_UNIT_WINDOW_OPEN_CLOSE_DETECTOR = 514;
+module.exports.HANFUN_UNIT_MOTION_DETECTOR = 515;
+module.exports.HANFUN_UNIT_FLOOD_DETECTOR = 518;
+module.exports.HANFUN_UNIT_GLAS_BREAK_DETECTOR = 519;
+module.exports.HANFUN_UNIT_VIBRATION_DETECTOR = 520;
+
+// HANFUN interfaces
+module.exports.HANFUN_INTERFACE_KEEP_ALIVE = 277;
+module.exports.HANFUN_INTERFACE_ALERT = 256;
+module.exports.HANFUN_INTERFACE_SIMPLE_BUTTON = 772;
 
 /*
  * Session handling
@@ -412,7 +457,7 @@ module.exports.getDeviceListFiltered = function(sid, filter, options)
             return Object.keys(filter).every(function(key) {
                 /* jshint laxbreak:true */
                 return key === 'functionbitmask'
-                    ? device.functionbitmask & filter[key]
+                    ? device.functionbitmask & filter[key] == filter[key]
                     : device[key] == filter[key];
             });
         });
@@ -589,8 +634,30 @@ module.exports.getBatteryCharge = function(sid, ain, options)
     });
 };
 
+// get window status from device list API with UI as fallback
 module.exports.getWindowOpen = function(sid, ain, options)
 {
+    /* jshint laxbreak:true */
+    var deviceList = options && options.deviceList
+        ? Promise.resolve(options.deviceList)
+        : module.exports.getDeviceList(sid, options);
+
+    deviceList.then(function(devices) {
+        options.deviceList = devices;
+
+        // find hanfun unit with AIN and alarm capability
+        module.exports.getDeviceListFiltered(sid, {
+            identifier: ain,
+            functionbitmask: module.exports.FUNCTION_HANFUN_UNIT | module.exports.FUNCTION_ALARM
+        }, {
+            deviceList: devices
+        }).then(function(device) {
+
+        });
+    });
+
+
+
     var dev = module.exports.getDevice(sid, ain, options),
         req = httpRequest('/data.lua', {
             method: 'POST',
