@@ -197,6 +197,31 @@ These definitions remain cached by the Fritz!Box even if the device is no longer
       temperature: { celsius: '', offset: '' },
       hkr: { tist: '', tsoll: '', absenk: '', komfort: '' } }
 
+### HANFUN
+
+As of Fritz!OS 7 the HANFUN devices have their own bitmask `1`:
+
+    { identifier: '119340326786',
+      id: '406',
+      functionbitmask: '1',
+      fwversion: '00.00',
+      manufacturer: '0x0feb',
+      productname: 'HAN-FUN',
+      present: '1',
+      name: 'HAN-FUN #1' }
+
+HANFUN functions are accessible as "HANFUN unit" devices. Bitmask consists of HANFUN unit (bit 13) plus actual function (in this case ALARM, bit 3):
+
+    { identifier: '119340326786-1',
+      id: '2000',
+      functionbitmask: '8208',
+      fwversion: '0.0',
+      manufacturer: '0x0feb',
+      productname: 'HAN-FUN',
+      present: '1',
+      name: 'no name',
+      etsiunitinfo: { etsideviceid: '406', unittype: '514', interfaces: '256' },
+      alert: { state: '1' } }
 
 ## AHA HTTP Interface Documentation
 
