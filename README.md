@@ -14,15 +14,22 @@ Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices.
 
 - Get the Fritz!OS version `getOSVserion`
 - Get the session ID `getSessionID`
-- Get device list as XML `getDeviceListInfo` >Fritz!OS 6.10
+- Get device list as XML `getDeviceListInfos` >Fritz!OS 6.10
 - Get device list `getDeviceList` >Fritz!OS 6.10
+- Get device list with filter criteria applied `getDeviceListFiltered` >Fritz!OS 6.10
 - Get device `getDevice` >Fritz!OS 6.10
 - Get temperature `getTemperature` - polyfill
 - Get presence `getPresence` - polyfill
 
 **Note**
 
-`getTemperature` is not available on the FRITZ!Powerline 546E WLAN set and will always return `NaN`.
+`getTemperature` works for DECT repeaters but is not available on the FRITZ!Powerline 546E WLAN set and will always return `NaN`.
+
+While `getTemperature` works for outlets, it is not available for (outlet) groups that can be created through the Fritz!Box user interface.
+
+`getDeviceListInfos` was named `getDeviceListInfo` in earlier versions. For consistency with the official Fritz!Box API the name has been changed. The `getDeviceListInfo` name is deprecated and will be removed in a future release. 
+In general, use of `getDeviceListInfos` is discouraged as the equivalent `getDeviceList` function which returns an object interface instead of XML is easier to use.
+
 
 ### Fritz!DECT 200 and 210 outlet functions (includes FRITZ!Powerline 546E)
 
@@ -37,13 +44,13 @@ Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices.
 
 For controlling AVM Fritz!DECT 200 devices the actuator identification number (AIN) is needed. The AIN can be obtained using `getSwitchList` which returns a list of AINs or the more general `getDeviceList` function which returns a verbose device list structure as JSON.
 
-`getTemperature` is not available for switch groups that can be created through the Fritz!Box user interface.
 
 ### Fritz!DECT 100 functions
 
 The Fritz!DECT 100 DECT repeater AIN does only appear in the `getDeviceList` output. It supports retrieving the repeater's temperature.
 
-### Fritz!DECT 300 and CometDECT thermostat functions
+
+### Fritz!DECT 300, 301 and CometDECT thermostat functions
 
 Thermostat functions are only available as of Fritz!OS 6.36
 
@@ -52,7 +59,8 @@ Thermostat functions are only available as of Fritz!OS 6.36
 - Get target temperature `getTempTarget`
 - Get comfort temperature `getTempComfort`
 - Get night temperature `getTempNight`
-- Get battery charge status `getBatteryCharge`
+- Get battery charge `getBatteryCharge` (uses UI scraping, may be unstable)
+- Get window open `getWindowOpen` (uses UI scraping, may be unstable)
 
 
 ### WLAN functions
@@ -123,7 +131,10 @@ fritz.getSessionID("user", "password", {
 
 ## Device details
 
-For sake of reference bolow is the output of `getDeviceList` as returned for the various Fritz devices I'm having around. These definitions remain cached by the Fritz!Box even if the device is no longer connected. The device presence is indicated by the `present` attribute.
+Below is the output of `getDeviceList` for reference.
+
+The list was produced for various Fritz devices I've had around. It might have changed in the meantime depending on device firmware or Fritz HTTP API version. 
+These definitions remain cached by the Fritz!Box even if the device is no longer connected. The device presence is indicated by the `present` attribute.
 
 ### Powerline
 
@@ -140,7 +151,7 @@ For sake of reference bolow is the output of `getDeviceList` as returned for the
 
 ### Outlets
 
-    { identifier: '08761 0103568',
+    { identifier: '087610103568',
       id: '16',
       functionbitmask: '640',
       fwversion: '03.59',
@@ -151,7 +162,7 @@ For sake of reference bolow is the output of `getDeviceList` as returned for the
       switch: { state: '', mode: '', lock: '' },
       powermeter: { power: '', energy: '' } }
 
-    { identifier: '11657 0031825',    
+    { identifier: '116570031825',    
       id: '18',
       functionbitmask: '640',
       fwversion: '03.67',
@@ -164,7 +175,7 @@ For sake of reference bolow is the output of `getDeviceList` as returned for the
 
 ### DECT Repeater
 
-    { identifier: '11657 0002527',
+    { identifier: '116570002527',
       id: '20',
       functionbitmask: '1024',
       fwversion: '03.64',
@@ -175,7 +186,7 @@ For sake of reference bolow is the output of `getDeviceList` as returned for the
 
 ### Thermostats
 
-    { identifier: '10971 0195784',
+    { identifier: '109710195784',
       id: '17',
       functionbitmask: '320',
       fwversion: '03.66',
@@ -186,6 +197,31 @@ For sake of reference bolow is the output of `getDeviceList` as returned for the
       temperature: { celsius: '', offset: '' },
       hkr: { tist: '', tsoll: '', absenk: '', komfort: '' } }
 
+### HANFUN
+
+As of Fritz!OS 7 the HANFUN devices have their own bitmask `1`:
+
+    { identifier: '119340326786',
+      id: '406',
+      functionbitmask: '1',
+      fwversion: '00.00',
+      manufacturer: '0x0feb',
+      productname: 'HAN-FUN',
+      present: '1',
+      name: 'HAN-FUN #1' }
+
+HANFUN functions are accessible as "HANFUN unit" devices. Bitmask consists of HANFUN unit (bit 13) plus actual function (in this case ALARM, bit 3):
+
+    { identifier: '119340326786-1',
+      id: '2000',
+      functionbitmask: '8208',
+      fwversion: '0.0',
+      manufacturer: '0x0feb',
+      productname: 'HAN-FUN',
+      present: '1',
+      name: 'no name',
+      etsiunitinfo: { etsideviceid: '406', unittype: '514', interfaces: '256' },
+      alert: { state: '1' } }
 
 ## AHA HTTP Interface Documentation
 

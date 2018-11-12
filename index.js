@@ -10,7 +10,8 @@
  *
  * based on: Node2Fritz by steffen.timm on 05.12.13 for Fritz!OS > 05.50
  * and  thk4711 (code https://github.com/pimatic/pimatic/issues/38)
- * Documentation is at http://www.avm.de/de/Extern/files/session_id/AHA-HTTP-Interface.pdf
+ *
+ * AVM Documentation is at https://avm.de/service/schnittstellen/
  */
 
 /* jshint esversion: 6, -W079 */
@@ -89,12 +90,21 @@ Fritz.prototype = {
         return this.call(module.exports.getOSVersion);
     },
 
+    // @deprecated
     getDeviceListInfo: function() {
         return this.call(module.exports.getDeviceListInfo);
     },
 
+    getDeviceListInfos: function() {
+        return this.call(module.exports.getDeviceListInfos);
+    },
+
     getDeviceList: function() {
         return this.call(module.exports.getDeviceList);
+    },
+
+    getDeviceListFiltered: function(filter) {
+        return this.call(module.exports.getDeviceListFiltered, filter);
     },
 
     getDevice: function(ain) {
@@ -165,6 +175,10 @@ Fritz.prototype = {
         return this.call(module.exports.getBatteryCharge, ain);
     },
 
+    getWindowOpen: function(ain) {
+        return this.call(module.exports.getWindowOpen, ain);
+    },
+
     getGuestWlan: function() {
         return this.call(module.exports.getGuestWlan);
     },
@@ -172,6 +186,12 @@ Fritz.prototype = {
     setGuestWlan: function(enable) {
         return this.call(module.exports.setGuestWlan, enable);
     },
+
+    /*
+     * Helper functions
+     */
+    api2temp: module.exports.api2temp,
+    temp2api: module.exports.temp2api
 };
 
 
@@ -233,39 +253,6 @@ function executeCommand(sid, command, ain, options, path)
     return httpRequest(path, {}, options);
 }
 
-/**
- * Parse guest WLAN form settings
- */
-function parseHTML(html)
-{
-    $ = cheerio.load(html);
-    var form = $('form');
-    var settings = {};
-
-    $('input', form).each(function(i, elem) {
-        var val;
-        var name = $(elem).attr('name');
-        if (!name) return;
-
-        switch ($(elem).attr('type')) {
-            case 'checkbox':
-                val = $(elem).attr('checked') == 'checked';
-                break;
-            default:
-                val = $(elem).val();
-        }
-        settings[name] = val;
-    });
-
-    $('select option[selected=selected]', form).each(function(i, elem) {
-        var val = $(elem).val();
-        var name = $(elem).parent().attr('name');
-        settings[name] = val;
-    });
-
-    return settings;
-}
-
 /*
  * Temperature conversion
  */
@@ -304,6 +291,8 @@ function api2temp(param)
 
 // run command for selected device
 module.exports.executeCommand = executeCommand;
+module.exports.api2temp = api2temp;
+module.exports.temp2api = temp2api;
 
 // supported temperature range
 module.exports.MIN_TEMP = MIN_TEMP;
@@ -383,24 +372,35 @@ module.exports.getOSVersion = function(sid, options)
 };
 
 // get detailed device information (XML)
-module.exports.getDeviceListInfo = function(sid, options)
+module.exports.getDeviceListInfos = function(sid, options)
 {
     return executeCommand(sid, 'getdevicelistinfos', null, options);
+};
+
+// @deprecated
+module.exports.getDeviceListInfo = function(sid, options)
+{
+    console.warn('`getDeviceListInfo` is deprecated. Use `getDeviceListInfos` instead.');
+    return module.exports.getDeviceListInfos(sid, options);
 };
 
 // get device list
 module.exports.getDeviceList = function(sid, options)
 {
-    return module.exports.getDeviceListInfo(sid, options).then(function(devicelistinfo) {
+    return module.exports.getDeviceListInfos(sid, options).then(function(devicelistinfo) {
         var devices = parser.xml2json(devicelistinfo);
         // extract devices as array
-        devices = [].concat((devices.devicelist || {}).device || []);
+        devices = [].concat((devices.devicelist || {}).device || []).map(function(device) {
+            // remove spaces in AINs
+            device.identifier = device.identifier.replace(/\s/g, '');
+            return device;
+        });
         return devices;
     });
 };
 
-// get single device
-module.exports.getDevice = function(sid, ain, options)
+// get device list by filter criteria
+module.exports.getDeviceListFiltered = function(sid, filter, options)
 {
     /* jshint laxbreak:true */
     var deviceList = options && options.deviceList
@@ -408,11 +408,24 @@ module.exports.getDevice = function(sid, ain, options)
         : module.exports.getDeviceList(sid, options);
 
     return deviceList.then(function(devices) {
-        var device = devices.find(function(device) {
-            return device.identifier.replace(/\s/g, '') == ain;
+        return devices.filter(function(device) {
+            return Object.keys(filter).every(function(key) {
+                /* jshint laxbreak:true */
+                return key === 'functionbitmask'
+                    ? device.functionbitmask & filter[key]
+                    : device[key] == filter[key];
+            });
         });
+    });
+};
 
-        return device || Promise.reject();
+// get single device
+module.exports.getDevice = function(sid, ain, options)
+{
+    return module.exports.getDeviceListFiltered(sid, {
+        identifier: ain
+    }, options).then(function(devices) {
+        return devices.length ? devices[0] : Promise.reject();
     });
 };
 
@@ -508,24 +521,13 @@ module.exports.getSwitchName = function(sid, ain, options)
  * Thermostats
  */
 
-// get the switch list
+// get the thermostat list
 module.exports.getThermostatList = function(sid, options)
 {
-    /* jshint laxbreak:true */
-    var deviceList = options && options.deviceList
-        ? Promise.resolve(options.deviceList)
-        : module.exports.getDeviceList(sid, options);
-
-    return deviceList.then(function(devices) {
-        // get thermostats- right now they're only available via the XML api
-        var thermostats = devices.filter(function(device) {
-            return device.functionbitmask & module.exports.FUNCTION_THERMOSTAT;
-        }).map(function(device) {
-            // fix ain
-            return device.identifier.replace(/\s/g, '');
-        });
-
-        return thermostats;
+    return module.exports.getDeviceListFiltered(sid, {
+        functionbitmask: module.exports.FUNCTION_THERMOSTAT
+    }, options).map(function(device) {
+        return device.identifier;
     });
 };
 
@@ -587,16 +589,72 @@ module.exports.getBatteryCharge = function(sid, ain, options)
     });
 };
 
+module.exports.getWindowOpen = function(sid, ain, options)
+{
+    var dev = module.exports.getDevice(sid, ain, options),
+        req = httpRequest('/data.lua', {
+            method: 'POST',
+            form: {
+                sid: sid,
+                xhr: 1,
+                no_sidrenew: '',
+                page: 'sh',
+            }
+        }, options);
+
+    return Promise.join(dev, req, function(device, body) {
+        $ = cheerio.load(body);
+
+        var elems = $('td.iconrow[datalabel="' + device.name + '"] ~ td.temperature');
+        if (elems.length == 1) {
+            return $('img[src*=icon_window_open]', elems[0]).length == 1;
+        }
+
+        return false;
+    });
+};
+
 
 /*
  * WLAN
  */
 
+// Parse guest WLAN form settings
+function parseGuestWlanHTML(html)
+{
+    $ = cheerio.load(html);
+    var form = $('form');
+    var settings = {};
+
+    $('input', form).each(function(i, elem) {
+        var val;
+        var name = $(elem).attr('name');
+        if (!name) return;
+
+        switch ($(elem).attr('type')) {
+            case 'checkbox':
+                val = $(elem).attr('checked') == 'checked';
+                break;
+            default:
+                val = $(elem).val();
+        }
+        settings[name] = val;
+    });
+
+    $('select option[selected=selected]', form).each(function(i, elem) {
+        var val = $(elem).val();
+        var name = $(elem).parent().attr('name');
+        settings[name] = val;
+    });
+
+    return settings;
+}
+
 // get guest WLAN settings - not part of Fritz API
 module.exports.getGuestWlan = function(sid, options)
 {
     return executeCommand(sid, null, null, options, '/wlan/guest_access.lua?0=0').then(function(body) {
-        return parseHTML(body);
+        return parseGuestWlanHTML(body);
     });
 };
 
@@ -607,7 +665,7 @@ module.exports.setGuestWlan = function(sid, enable, options)
     var settings = enable instanceof Object
         ? Promise.resolve(enable)
         : executeCommand(sid, null, null, options, '/wlan/guest_access.lua?0=0').then(function(body) {
-            return extend(parseHTML(body), {
+            return extend(parseGuestWlanHTML(body), {
                 activate_guest_access: enable
             });
         });
@@ -633,7 +691,7 @@ module.exports.setGuestWlan = function(sid, enable, options)
         };
 
         return httpRequest('/data.lua', req, options).then(function(body) {
-            return parseHTML(body);
+            return parseGuestWlanHTML(body);
         });
     });
 };
