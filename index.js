@@ -94,7 +94,16 @@ Fritz.prototype = {
     getDeviceListInfo: function() {
         return this.call(module.exports.getDeviceListInfo);
     },
+    
+    //new functions related to templates in version 7
+    getTemplateListInfos : function() {
+        return this.call(module.exports.getTemplateListInfos );
+    },
 
+    setTemplate: function(ain) {
+        return this.call(module.exports.setTemplate, ain);
+    },
+    
     getDeviceListInfos: function() {
         return this.call(module.exports.getDeviceListInfos);
     },
@@ -368,6 +377,21 @@ module.exports.getOSVersion = function(sid, options)
             ? json.data.fritzos.nspver
             : null;
         return osVersion;
+    });
+};
+
+// get template information (XML)
+module.exports.getTemplateListInfos  = function(sid, options)
+{
+    return executeCommand(sid, 'gettemplatelistinfos', null, options);
+};
+
+// apply template
+module.exports.setTemplate = function(sid, ain, options)
+{
+    return executeCommand(sid, 'applytemplate', ain, options).then(function(body) {
+        var patt = new RegExp(ain);
+        return patt.test(body); // returns applied ain if success -> true if successful
     });
 };
 
