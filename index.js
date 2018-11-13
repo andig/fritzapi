@@ -94,7 +94,7 @@ Fritz.prototype = {
     getDeviceListInfo: function() {
         return this.call(module.exports.getDeviceListInfo);
     },
-    
+
     getDeviceListInfos: function() {
         return this.call(module.exports.getDeviceListInfos);
     },
