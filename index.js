@@ -418,7 +418,7 @@ module.exports.applyTemplate = function(sid, ain, options)
 // get basic device info (XML)
 module.exports.getBasicDeviceStats  = function(sid, options)
 {
-    return executeCommand(sid, 'getbasicdevicestats', null, options);
+    return executeCommand(sid, 'getbasicdevicestats', ain, options);
 };
 
 // get detailed device information (XML)
