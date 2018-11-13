@@ -95,19 +95,21 @@ Fritz.prototype = {
         return this.call(module.exports.getDeviceListInfo);
     },
     
+    getDeviceListInfos: function() {
+        return this.call(module.exports.getDeviceListInfos);
+    },
+    
     //new functions related to templates in version 7
     getTemplateListInfos : function() {
-        return this.call(module.exports.getTemplateListInfos );
+        return this.call(module.exports.getTemplateListInfos);
+    },
+    getTemplateList : function() {
+        return this.call(module.exports.getTemplateList);
     },
     applyTemplate: function(ain) {
         return this.call(module.exports.applyTemplate, ain);
     },
-    
-    //new functions related to templates in version 7
-    getTemplateListInfos : function() {
-        return this.call(module.exports.getTemplateListInfos );
-    },
-    
+
     //new functions related to devices in version 7
     getBasicDeviceStats: function() {
         return this.call(module.exports.getBasicDeviceStats);
