@@ -20,6 +20,9 @@ Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices.
 - Get device `getDevice` >Fritz!OS 6.10
 - Get temperature `getTemperature` - polyfill
 - Get presence `getPresence` - polyfill
+- Get template list as XML `getTemplateListInfos` >Fritz!OS 7.0
+- Get template list `getTemplateList` >Fritz!OS 7.0
+- Get template list `applyTemplate` >Fritz!OS 7.0
 
 **Note**
 
@@ -41,6 +44,7 @@ In general, use of `getDeviceListInfos` is discouraged as the equivalent `getDev
 - Get energy `getSwitchEnergy`
 - Get presence status `getSwitchPresence`
 - Get name `getSwitchName`
+- Get basic device stats as XML `getBasicDeviceStats` >Fritz!OS 7.0
 
 For controlling AVM Fritz!DECT 200 devices the actuator identification number (AIN) is needed. The AIN can be obtained using `getSwitchList` which returns a list of AINs or the more general `getDeviceList` function which returns a verbose device list structure as JSON.
 
