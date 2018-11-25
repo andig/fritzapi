@@ -98,6 +98,22 @@ Fritz.prototype = {
     getDeviceListInfos: function() {
         return this.call(module.exports.getDeviceListInfos);
     },
+    
+    //new functions related to templates in version 7
+    getTemplateListInfos : function() {
+        return this.call(module.exports.getTemplateListInfos);
+    },
+    getTemplateList : function() {
+        return this.call(module.exports.getTemplateList);
+    },
+    applyTemplate: function(ain) {
+        return this.call(module.exports.applyTemplate, ain);
+    },
+
+    //new functions related to devices in version 7
+    getBasicDeviceStats: function() {
+        return this.call(module.exports.getBasicDeviceStats);
+    },
 
     getDeviceList: function() {
         return this.call(module.exports.getDeviceList);
@@ -369,6 +385,40 @@ module.exports.getOSVersion = function(sid, options)
             : null;
         return osVersion;
     });
+};
+
+// get template information (XML)
+module.exports.getTemplateListInfos  = function(sid, options)
+{
+    return executeCommand(sid, 'gettemplatelistinfos', null, options);
+};
+
+// get template information (json)
+module.exports.getTemplateList = function(sid, options)
+{
+    return module.exports.getTemplateListInfos(sid, options).then(function(templateinfo) {
+        var templates = parser.xml2json(templateinfo);
+        // extract templates as array
+        templates = [].concat((templates.templatelist || {}).template || []).map(function(template) {
+            return template;
+        });
+        return templates;
+    });
+};
+
+// apply template
+module.exports.applyTemplate = function(sid, ain, options)
+{
+    return executeCommand(sid, 'applytemplate', ain, options).then(function(body) {
+        var patt = new RegExp(ain);
+        return patt.test(body); // returns applied ain if success -> true if successful
+    });
+};
+
+// get basic device info (XML)
+module.exports.getBasicDeviceStats  = function(sid, options)
+{
+    return executeCommand(sid, 'getbasicdevicestats', ain, options);
 };
 
 // get detailed device information (XML)
