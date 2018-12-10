@@ -410,8 +410,7 @@ module.exports.getTemplateList = function(sid, options)
 module.exports.applyTemplate = function(sid, ain, options)
 {
     return executeCommand(sid, 'applytemplate', ain, options).then(function(body) {
-        var patt = new RegExp(ain);
-        return patt.test(body); // returns applied ain if success -> true if successful
+        return body; // returns applied id if success
     });
 };
 
