@@ -32,10 +32,7 @@ function Fritz(username, password, uri, strictssl) {
     this.sid = null;
     this.username = username;
     this.password = password;
-    this.options = { url: uri || 'http://fritz.box' };
-
-    // set ssl option
-    if( strictssl !== undefined ) this.options.strictSSL = strictssl;
+    this.options = { url: uri || 'http://fritz.box', strictSSL: strictssl };
 
     //bitfunctions hidden, unchangable to prototype
     if (!Fritz.prototype.ALARM)             { Object.defineProperty( Fritz.prototype, "ALARM",             {value: module.exports.FUNCTION_ALARM,             writable: false}); }
