@@ -50,7 +50,7 @@
     "bluebird": "^3.0.2",
     "cheerio": "^0.22.0",
     "command-line-args": "^5.1.1",
-    "command-line-usage": "^4.0.0",
+    "command-line-usage": "^6.0.2",
     "extend": "^3.0.0",
     "request": "^2.87.0",
     "xml2json-light": "^1.0.4"
