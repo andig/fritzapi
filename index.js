@@ -32,7 +32,6 @@ function Fritz(username, password, uri) {
     this.sid = null;
     this.username = username;
     this.password = password;
-
     this.options = { url: uri || 'http://fritz.box' };
 
     //bitfunctions hidden, unchangable to prototype
@@ -99,14 +98,15 @@ Fritz.prototype = {
     getDeviceListInfos: function() {
         return this.call(module.exports.getDeviceListInfos);
     },
-    
-    //new functions related to templates in version 7
+
     getTemplateListInfos : function() {
         return this.call(module.exports.getTemplateListInfos);
     },
+
     getTemplateList : function() {
         return this.call(module.exports.getTemplateList);
     },
+
     applyTemplate: function(ain) {
         return this.call(module.exports.applyTemplate, ain);
     },
@@ -211,6 +211,13 @@ Fritz.prototype = {
     temp2api: module.exports.temp2api
 };
 
+
+/*
+ * Functional API
+ */
+
+var defaults = { url: 'http://fritz.box' };
+
 /**
  * Check if numeric value
  */
@@ -224,7 +231,7 @@ function isNumeric(n) {
 function httpRequest(path, req, options)
 {
     return new Promise(function(resolve, reject) {
-        req = extend({}, options.url, req, options);
+        req = extend({}, defaults, req, options);
         req.url += path;
 
         request(req, function(error, response, body) {
@@ -325,6 +332,7 @@ module.exports.getSessionID = function(username, password, options)
 {
     if (typeof username !== 'string') throw new Error('Invalid username');
     if (typeof password !== 'string') throw new Error('Invalid password');
+
     return executeCommand(null, null, null, options, '/login_sid.lua').then(function(body) {
         var challenge = body.match("<Challenge>(.*?)</Challenge>")[1];
         var challengeResponse = challenge +'-'+
