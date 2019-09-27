@@ -1,6 +1,6 @@
 {
   "name": "fritzapi",
-  "version": "0.10.6",
+  "version": "0.10.7",
   "author": "Andreas Goetz <cpuidle@gmx.de>",
   "description": "Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices",
   "homepage": "https://github.com/andig/fritzapi",
@@ -47,18 +47,18 @@
     "coverage": "istanbul cover _mocha"
   },
   "dependencies": {
-    "bluebird": "^3.0.2",
+    "bluebird": "^3.5.5",
     "cheerio": "^0.22.0",
     "command-line-args": "^5.1.1",
     "command-line-usage": "^6.0.2",
-    "extend": "^3.0.0",
-    "request": "^2.87.0",
-    "xml2json-light": "^1.0.4"
+    "extend": "^3.0.2",
+    "request": "^2.88.0",
+    "xml2json-light": "^1.0.6"
   },
   "devDependencies": {
     "chai": "4.2.x",
     "istanbul": "^0.4.5",
-    "jshint": "^2.9.5",
+    "jshint": "^2.10.2",
     "mocha": "^6.2.0"
   }
 }
