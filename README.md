@@ -96,7 +96,7 @@ Get the list of switch AINs using a customer Fritz!Box address:
 ```js
 var Fritz = require('fritzapi').Fritz;
 
-var f = new Fritz("user", "password", "192.168.178.1");
+var f = new Fritz("user", "password", "http://192.168.178.1");
 
 f.getSwitchList().then(function(ains){
   console.log(f.getSID());
