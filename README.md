@@ -12,7 +12,7 @@ Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices.
 
 ### General functions
 
-- Get the Fritz!OS version `getOSVserion`
+- Get the Fritz!OS version `getOSVersion`
 - Get the session ID `getSessionID`
 - Get device list as XML `getDeviceListInfos` >Fritz!OS 6.10
 - Get device list `getDeviceList` >Fritz!OS 6.10
