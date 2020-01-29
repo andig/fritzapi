@@ -10,7 +10,9 @@
 
 var Fritz = require('./index.js').Fritz,
     commandLineArgs = require('command-line-args'),
-    getUsage = require('command-line-usage');
+    getUsage = require('command-line-usage'),
+    csv = require('csv');
+
 
 // utility function to sequentialize promises
 function sequence(promises) {
