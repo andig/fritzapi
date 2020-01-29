@@ -10,7 +10,9 @@
 
 var Fritz = require('./index.js').Fritz,
     commandLineArgs = require('command-line-args'),
-    getUsage = require('command-line-usage');
+    getUsage = require('command-line-usage'),
+    csv = require('csv');
+
 
 // utility function to sequentialize promises
 function sequence(promises) {
@@ -92,6 +94,24 @@ function thermostats() {
         ]);
       };
     }));
+  });
+}
+
+
+// show phone List
+function phoneList() {
+  return fritz.getPhoneList().then(function(body) {
+    console.log("Phone list as csv: "+body);
+    // strip first line with delimiter
+    csv.parse(body.split("\n").slice(1).join("\n"), {
+      delimiter: ';'
+    }, function(err, data) {
+      if (err) {
+        console.log("Error in converting csv!")
+      } else {
+        console.log("Phone list: "+JSON.stringify(data));
+      }
+    });
   });
 }
 
