@@ -203,6 +203,11 @@ Fritz.prototype = {
     setGuestWlan: function(enable) {
         return this.call(module.exports.setGuestWlan, enable);
     },
+    
+    getPhoneList: function() {
+        return executeCommand(this.sid, null, null, null, "/fon_num/foncalls_list.lua?csv=");
+    },
+
 
     /*
      * Helper functions
