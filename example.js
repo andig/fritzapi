@@ -82,21 +82,54 @@ function thermostats() {
           function() {
             return fritz.getTemperature(thermostat).then(function(temp) {
               temp = isNaN(temp) ? '-' : temp + "°C";
-              console.log("[" + thermostat + "] temp " + temp + "°C");
+              console.log("[" + thermostat + "] temp: " + temp);
             });
           },
           function() {
             return fritz.getTempTarget(thermostat).then(function(temp) {
               temp = isNaN(temp) ? '-' : temp + "°C";
-              console.log("[" + thermostat + "] target temp " + temp + "°C\n");
+              console.log("[" + thermostat + "] target temp: " + temp + "\n");
             });
-          }
+          }          
         ]);
       };
     }));
   });
 }
 
+// display bulb information
+function bulbs() {
+  return fritz.getBulbList().then(function(bulbs) {
+    console.log("Bulbs: " + bulbs + "\n");
+
+    return sequence(bulbs.map(function(bulb) {
+      return function() {
+        return sequence([
+          function() {
+          // same as for thermostats, use getdevice for device information
+          // Not very efficient, because the complete device list is
+          // downloaded for each device again, but this is a demo, so what ...
+          return fritz.getDevice(bulb).then(function(device) {
+              console.log("[" + bulb + "] " + device.name);
+              console.log("[" + bulb + "] presence: " + device.present);
+              onOff = device.simpleonoff.state == '0' ? 'off' : 'on';
+              console.log("[" + bulb + "] state: " + onOff);
+              // a bulb has either hue/saturation values
+              if (device.colorcontrol.hue != '') {
+                console.log("[" + bulb + "] hue: " + device.colorcontrol.hue);
+                console.log("[" + bulb + "] saturation: " + device.colorcontrol.saturation);
+              }
+              // or a color temperature
+              else
+                console.log("[" + bulb + "] temperature: " + device.colorcontrol.temperature);
+              console.log("[" + bulb + "] level: " + device.levelcontrol.level + '\n');
+            });       
+          }
+        ]);
+      };
+    }));
+  });
+}
 
 // show phone List
 function phoneList() {
@@ -128,7 +161,7 @@ function debug() {
 const cmdOptionsDefinition = [
   { name: 'username', alias: 'u', type: String },
   { name: 'password', alias: 'p', type: String },
-  { name: 'types', alias: 't', type: String, multiple: true, description: 'switches|thermostats|debug, default is all, multiple possible' },
+  { name: 'types', alias: 't', type: String, multiple: true, description: 'switches|thermostats|bulbs|debug, default is all, multiple possible' },
   { name: 'url', type: String },
   { name: 'help', alias: 'h', type: Boolean }
 ];
@@ -159,6 +192,11 @@ if (cmdOptions.types === undefined || cmdOptions.types.indexOf('switches') >= 0)
 if (cmdOptions.types === undefined || cmdOptions.types.indexOf('thermostats') >= 0) {
   tasks.push(function() {
     return thermostats();
+  });
+}
+if (cmdOptions.types === undefined || cmdOptions.types.indexOf('bulbs') >= 0) {
+  tasks.push(function() {
+    return bulbs();
   });
 }
 if (cmdOptions.types === undefined || cmdOptions.types.indexOf('debug') >= 0) {

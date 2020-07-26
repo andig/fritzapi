@@ -35,12 +35,21 @@ function Fritz(username, password, uri) {
     this.options = { url: uri || 'http://fritz.box' };
 
     //bitfunctions hidden, unchangable to prototype
+    if (!Fritz.prototype.HANFUN)            { Object.defineProperty( Fritz.prototype, "HANFUN",            {value: module.exports.FUNCTION_HANFUN,            writable: false}); }
+    if (!Fritz.prototype.LIGHT)             { Object.defineProperty( Fritz.prototype, "LIGHT",             {value: module.exports.FUNCTION_LIGHT,             writable: false}); }
     if (!Fritz.prototype.ALARM)             { Object.defineProperty( Fritz.prototype, "ALARM",             {value: module.exports.FUNCTION_ALARM,             writable: false}); }
+    if (!Fritz.prototype.BUTTON)            { Object.defineProperty( Fritz.prototype, "BUTTON",            {value: module.exports.FUNCTION_BUTTON,            writable: false}); }
     if (!Fritz.prototype.THERMOSTAT)        { Object.defineProperty( Fritz.prototype, "THERMOSTAT",        {value: module.exports.FUNCTION_THERMOSTAT,        writable: false}); }
     if (!Fritz.prototype.ENERGYMETER)       { Object.defineProperty( Fritz.prototype, "ENERGYMETER",       {value: module.exports.FUNCTION_ENERGYMETER,       writable: false}); }
     if (!Fritz.prototype.TEMPERATURESENSOR) { Object.defineProperty( Fritz.prototype, "TEMPERATURESENSOR", {value: module.exports.FUNCTION_TEMPERATURESENSOR, writable: false}); }
     if (!Fritz.prototype.OUTLET)            { Object.defineProperty( Fritz.prototype, "OUTLET",            {value: module.exports.FUNCTION_OUTLET,            writable: false}); }
     if (!Fritz.prototype.DECTREPEATER)      { Object.defineProperty( Fritz.prototype, "DECTREPEATER",      {value: module.exports.FUNCTION_DECTREPEATER,      writable: false}); }
+    if (!Fritz.prototype.MICROFONE)         { Object.defineProperty( Fritz.prototype, "MICROFONE",         {value: module.exports.FUNCTION_MICROFONE,         writable: false}); }
+    if (!Fritz.prototype.TEMPLATE)          { Object.defineProperty( Fritz.prototype, "TEMPLATE",          {value: module.exports.FUNCTION_TEMPLATE,          writable: false}); }
+    if (!Fritz.prototype.HANFUNUNIT)        { Object.defineProperty( Fritz.prototype, "HANFUNUNIT",        {value: module.exports.FUNCTION_HANFUNUNIT,        writable: false}); }
+    if (!Fritz.prototype.SWITCHCTRL)        { Object.defineProperty( Fritz.prototype, "SWITCHCTRL",        {value: module.exports.FUNCTION_SWITCHCTRL,        writable: false}); }
+    if (!Fritz.prototype.LEVELCTRL)         { Object.defineProperty( Fritz.prototype, "LEVELCTRL",         {value: module.exports.FUNCTION_LEVELCTRL,         writable: false}); }
+    if (!Fritz.prototype.COLORCTRL)         { Object.defineProperty( Fritz.prototype, "COLORCTRL",         {value: module.exports.FUNCTION_COLORCTRL,         writable: false}); }
 }
 
 Fritz.prototype = {
@@ -99,6 +108,7 @@ Fritz.prototype = {
         return this.call(module.exports.getDeviceListInfos);
     },
 
+    // templates
     getTemplateListInfos : function() {
         return this.call(module.exports.getTemplateListInfos);
     },
@@ -128,6 +138,7 @@ Fritz.prototype = {
         return this.call(module.exports.getDevice, ain);
     },
 
+    // multiple devices
     getTemperature: function(ain) {
         return this.call(module.exports.getTemperature, ain);
     },
@@ -136,6 +147,7 @@ Fritz.prototype = {
         return this.call(module.exports.getPresence, ain);
     },
 
+    // plug commands
     getSwitchList: function() {
         return this.call(module.exports.getSwitchList);
     },
@@ -150,6 +162,10 @@ Fritz.prototype = {
 
     setSwitchOff: function(ain) {
         return this.call(module.exports.setSwitchOff, ain);
+    },
+
+    setSwitchToggle: function(ain) {
+        return this.call(module.exports.setSwitchToggle, ain);
     },
 
     getSwitchEnergy: function(ain) {
@@ -168,6 +184,7 @@ Fritz.prototype = {
         return this.call(module.exports.getSwitchName, ain);
     },
 
+    // thermostat commands
     getThermostatList: function() {
         return this.call(module.exports.getThermostatList);
     },
@@ -188,6 +205,59 @@ Fritz.prototype = {
         return this.call(module.exports.getTempComfort, ain);
     },
 
+    // setHkrBoost: function(ain, endtime) {
+    //     return this.call(module.exports.setHkrBoost, ain, endtime);
+    // },
+
+    // setHkrWindowOpen: function(ain, endtime) {
+    //     return this.call(module.exports.setHkrWindowOpen, ain, endtime);
+    // },
+
+    // light related
+
+    getBulbList: function() {
+        return this.call(module.exports.getBulbList);
+    },
+
+    getColorBulbList: function() {
+        return this.call(module.exports.getColorBulbList);
+    },
+
+    getDimmableBulbList: function() {
+        return this.call(module.exports.getDimmableBulbList);
+    },
+
+    setSimpleOnOff: function(ain, state) {
+        return this.call(module.exports.setSimpleOnOff, ain, state);
+    },
+
+    setLevel: function(ain, level) {
+        return this.call(module.exports.setLevel, ain, level);
+    },
+
+    setLevelPercentage: function(ain, levelInPercent) {
+        return this.call(module.exports.setLevelPercentage, ain, levelInPercent);
+    },
+
+    setColor: function(ain, color, satindex, duration) {
+        return this.call(module.exports.setColor, ain,color, satindex, duration);
+    },
+
+    setColorTemperature: function(ain, temperature, duration) {
+        return this.call(module.exports.setColorTemperature, ain, temperature, duration);
+    },
+
+    getColorDefaults: function(ain) {
+        return this.call(module.exports.getColorDefaults, ain);
+    },
+
+    // Blind related
+    // setBlind: function(ain, blindState) {
+    //     return this.call(module.exports.setBlind, ain, blindState);
+    // },
+
+
+    // ---------------------------------------------
     getBatteryCharge: function(ain) {
         return this.call(module.exports.getBatteryCharge, ain);
     },
@@ -309,6 +379,115 @@ function api2temp(param)
     }
 }
 
+// function time2api(param)
+// {
+//     // convert the input to a unix timestamp
+//     return 0;
+// }
+
+// function api2time(param)
+// {
+//     // convert the input to a readable timestamp
+//     return 0;
+// }
+
+function state2api(param)
+{
+    // convert the input to an allowed value
+    if (isNumeric(param))
+        return (param > 2 ? 2 : param);
+    else if ((typeof param) == "string")
+    {
+        
+        switch(param.toUpperCase())
+        {
+            case "OFF":     return 0; break;
+            case "ON":      return 1; break;
+            case "TOGGLE":  
+            default:        return 2; break;
+        }
+    }
+    else     
+        return 2;
+}
+
+function level2api(param, isPercent)
+{
+    // convert the input to an allowed value
+    if (isPercent)
+        return (param > 100 ? 100 : param);
+    else
+        return (param > 255 ? 255 : param);
+    return 0;
+}
+
+// The fritzbox accepts only a predefined set of color temperatures
+// Setting the color temperature to other values fails silently.
+function colortemp2api(param)
+{
+    if (param > 6200)
+        return 6500;
+    else if (param > 5600)
+        return 5900;
+    else if (param > 5000)
+        return 5300;
+    else if (param > 4500)
+        return 4700;
+    else if (param > 4000)
+        return 4200;
+    else if (param > 3600)
+        return 3800;
+    else if (param > 3200)
+        return 3400;
+    else if (param > 2850)
+        return 3000;
+    else
+        return 2700;
+}
+
+// Fritz color schemes
+// The fritzbox accepts only a limited range of hue/saturation combinations
+// to set the color of a bulb. The hue value must be one of the 12 predefined
+// values for the base colors and each of the hue values has its own set of 
+// three saturation values.
+// Any attempt to use other hue/saturaion values fails silently.
+colors = {
+    "red"       : {"hue" : 358, "sat" : [180,112,54], "val" : [255,255,255] },
+    "orange"    : {"hue" : 35,  "sat" : [214,140,72], "val" : [252,252,255] },
+    "yellow"    : {"hue" : 52,  "sat" : [153,102,51], "val" : [255,255,255] },
+    "lime"      : {"hue" : 92,  "sat" : [123, 79,38], "val" : [248,250,252] },
+    "green"     : {"hue" : 120, "sat" : [160, 82,38], "val" : [220,232,242] },
+    "turquoise" : {"hue" : 160, "sat" : [145, 84,41], "val" : [235,242,248] },
+    "cyan"      : {"hue" : 195, "sat" : [179,118,59], "val" : [255,255,255] },
+    "lightblue" : {"hue" : 212, "sat" : [169,110,56], "val" : [252,252,255] },
+    "blue"      : {"hue" : 225, "sat" : [204,135,67], "val" : [255,255,255] },
+    "purple"    : {"hue" : 266, "sat" : [169,110,54], "val" : [250,250,252] },
+    "magenta"   : {"hue" : 296, "sat" : [140, 92,46], "val" : [250,252,255] },
+    "pink"      : {"hue" : 335, "sat" : [180,107,51], "val" : [255,248,250] }
+}
+
+function color2apihue(color)
+{
+    var col = colors[color.toLowerCase()];
+    if (typeof col != 'undefined')
+        // convert the input to an allowed value
+        return col.hue;
+    else
+        // unknow color, return a value that will change nothing
+        return 0;
+}
+
+function satindex2apisat(color, satindex)
+{
+    var col = colors[color.toLowerCase()];
+    if (typeof col != 'undefined')
+        // convert the input to an allowed value
+        return col.sat[(satindex > 2 ? 0 : satindex)];
+    else
+        // unknow color, return a value that will change nothing
+        return 0;    
+}
+
 // #############################################################################
 
 // run command for selected device
@@ -321,12 +500,21 @@ module.exports.MIN_TEMP = MIN_TEMP;
 module.exports.MAX_TEMP = MAX_TEMP;
 
 // functions bitmask
+module.exports.FUNCTION_HANFUN              = 1;       // HAN-FUN device
+module.exports.FUNCTION_LIGHT               = 1 << 2;  // Bulb
 module.exports.FUNCTION_ALARM               = 1 << 4;  // Alarm Sensor
+module.exports.FUNCTION_BUTTON              = 1 << 5;  // Button device
 module.exports.FUNCTION_THERMOSTAT          = 1 << 6;  // Comet DECT, Heizkostenregler
 module.exports.FUNCTION_ENERGYMETER         = 1 << 7;  // Energie Messgerät
 module.exports.FUNCTION_TEMPERATURESENSOR   = 1 << 8;  // Temperatursensor
 module.exports.FUNCTION_OUTLET              = 1 << 9;  // Schaltsteckdose
 module.exports.FUNCTION_DECTREPEATER        = 1 << 10; // AVM DECT Repeater
+module.exports.FUNCTION_MICROFONE           = 1 << 11; // Microphone
+module.exports.FUNCTION_TEMPLATE            = 1 << 12; // Template
+module.exports.FUNCTION_HANFUNUNIT          = 1 << 13; // HAN-FUN unit
+module.exports.FUNCTION_SWITCHCTRL          = 1 << 15; // Simple switch on/off
+module.exports.FUNCTION_LEVELCTRL           = 1 << 16; // level
+module.exports.FUNCTION_COLORCTRL           = 1 << 17; // color
 
 /*
  * Session handling
@@ -538,6 +726,14 @@ module.exports.setSwitchOff = function(sid, ain, options)
     });
 };
 
+// toggle an outlet. returns the state the outlet was set to
+module.exports.setSwitchToggle = function(sid, ain, options)
+{
+    return executeCommand(sid, 'setswitchtoggle', ain, options).then(function(body) {
+        return /^1/.test(body); // false if off
+    });
+};
+
 // get the total enery consumption. returns the value in Wh
 module.exports.getSwitchEnergy = function(sid, ain, options)
 {
@@ -619,7 +815,157 @@ module.exports.getTempComfort = function(sid, ain, options)
     });
 };
 
+// ------------------------------------------------
+// Not yet tested - deactivated for now
+//
+// activate boost with end time or deactivate boost
+// module.exports.setHkrBoost = function(sid, ain, endtime, options)
+// {
+//     return executeCommand(sid, 'sethkrboost&endtimestamp=' + time2api(temp), ain, options).then(function(body) {
+//         // api does not return a value
+//         return temp;
+//     });
+// };
+
+// activate window open  with end time or deactivate boost
+// module.exports.setHkrWindowOpen = function(sid, ain, endtime, options)
+// {
+//     return executeCommand(sid, 'sethkrwindowopen&endtimestamp=' + time2api(temp), ain, options).then(function(body) {
+//         // api does not return a value
+//         return temp;
+//     });
+// };
+// ------------------------------------------------
+
+/*
+ * AVM Buttons Fritz!DECT 400 and Fritz!DECT 440
+ * Querying a button isn't really useful because they don't have a state to query,
+ * there is just a timestamp of the last short and long button press.
+ * The only useful information is the battery status returned in the 'battery' and 
+ * 'batterylow' property.
+ * The Fritz!DECT 440 should have an additional 'temperature' property
+ */
+
+// get a list of all button devices 
+module.exports.getButtonList = function(sid, options)
+{
+    return module.exports.getDeviceListFiltered(sid, {
+        functionbitmask: module.exports.FUNCTION_BUTTON
+    }, options).map(function(device) {
+        return device.identifier;
+    });
+};
+
+
+/*
+ * Light bulbs (HAN-FUN)
+ */
+
+// get a list of all bulbs 
+module.exports.getBulbList = function(sid, options)
+{
+    return module.exports.getDeviceListFiltered(sid, {
+        functionbitmask: module.exports.FUNCTION_LIGHT
+        }, options).map(function(device) {
+        return device.identifier;
+    });
+};
+
+// get a list of bulbs which support colors
+module.exports.getColorBulbList = function(sid, options)
+{
+    return module.exports.getDeviceListFiltered(sid, {
+        functionbitmask: module.exports.FUNCTION_LIGHT | module.exports.FUNCTION_COLORCTRL
+        }, options).map(function(device) {
+        return device.identifier;
+    });
+};
+
+// switch the device on, of or toggle its current state
+module.exports.setSimpleOnOff = function(sid, ain, state, options)
+{
+    //ain = ain.replace('-1','');
+    return executeCommand(sid, 'setsimpleonoff&onoff=' + state2api(state), ain, options).then(function(body) {
+        // api does not return a value
+        return state;
+    });
+};
+
+// Dimm the device, allowed values are 0 - 255
+module.exports.setLevel = function(sid, ain, level, options)
+{
+    return executeCommand(sid, 'setlevel&level=' + level2api(level,false), ain, options).then(function(body) {
+        // api does not return a value
+        return level;
+    });
+};
+
+// Dimm the device, allowed values are 0 - 100
+module.exports.setLevelPercentage = function(sid, ain, levelInPercent, options)
+{
+    return executeCommand(sid, 'setlevelpercentage&level=' + level2api(level,true), ain, options).then(function(body) {
+        // api does not return a value
+        return level;
+    });
+};
+
+// Set the color and saturation of a color bulb
+// Valid color values are:
+// red, orange, yellow, lime, green, turquoise, cyan, 
+// lightblue, blue, purple, magenta and pink
+// Valid satindex values are: 0, 1 or 2 
+module.exports.setColor = function(sid, ain,  color, satindex, duration, options)
+{
+    return executeCommand(sid, 'setcolor&hue=' + color2apihue(color) +
+                                '&saturation=' + satindex2apisat(color, satindex) +
+                                '&duration=' + duration, ain, options).then(function(body) {
+        // api does not return a value
+        return color;
+    });
+};
+
+// Set the color temperature of a bulb.
+// Valid values are 2700, 3000, 3400,3800, 4200, 4700, 5300, 5900 and 6500. 
+// Other values are adjusted to one of the above values
+module.exports.setColorTemperature = function(sid, ain,  temperature, duration, options)
+{
+    var temp = colortemp2api(temperature);
+    return executeCommand(sid, 'setcolortemperature&temperature=' + temp +
+                               '&duration=' + duration, ain, options).then(function(body) {
+        // api does not return a value, return our corrected value
+        return temp;
+    });
+};
+
+// get the color defaults
+// This is mostly useless because they are no defaults which can be changed but 
+// fixed values. Only combinations returned by this api call are accepted by
+// setcolor and setcolortemperature.
+// module.exports.getColorDefaults = function(sid, ain, options)
+// {
+//     return executeCommand(sid, 'getcolordefaults', ain, options).then(function(body) {
+//         return body;
+//     });
+// };
+
+// ------------------------------------------------
+// Not yet tested - deactivated for now
+// I don't know about any blind control unit with HANFUN support, but this API call makes 
+// it plausible that AVM or a partner has somthing like that in the pipeline.
+// 
+// module.exports.setBlind = function(sid, ain,  blindState, options)
+// {
+//     // „open“, „close“ or „stop“
+//     return executeCommand(sid, 'setblind&target=' + blindstate2api(blindState), ain, options).then(function(body) {
+//         // api does not return a value
+//         return blindState;
+//     });
+// };
+
 // get battery charge - not part of Fritz API
+// - not really true, the button and the thermostat both have a 'battery' and a 'battterylow' property
+//   which seems to be a more reliable source than parsing a html page which might change or have a
+//   different text in other languages.
 module.exports.getBatteryCharge = function(sid, ain, options)
 {
     return module.exports.getDevice(sid, ain, options).then(function(device) {
@@ -644,6 +990,21 @@ module.exports.getBatteryCharge = function(sid, ain, options)
     });
 };
 
+/* The above should be replaced by this, even though the whole device list is queried
+under the hood:
+
+module.exports.getBatteryCharge = function(sid, ain, options)
+{
+    return module.exports.getDevice(sid, ain, options).then(function(device) {
+        return device.battery;
+    });
+};
+
+*/
+
+// Same here as for getBatteryCharge. 
+// The Comet thermostats have 'hkr.windowopenactiv' and hkr.windowopenactiveendtime' properties
+// which are more reliable than scanning a html page.
 module.exports.getWindowOpen = function(sid, ain, options)
 {
     var dev = module.exports.getDevice(sid, ain, options),
@@ -668,6 +1029,19 @@ module.exports.getWindowOpen = function(sid, ain, options)
         return false;
     });
 };
+
+/* The above should be replaced by this, even though the whole device list is queried
+under the hood:
+
+module.exports.getWindowOpen = function(sid, ain, options)
+{
+    return module.exports.getDevice(sid, ain, options).then(function(device) {
+        return device.hkr.windowopenactiv == '0' ? false : true;
+    });
+}
+
+*/
+
 
 
 /*
@@ -750,3 +1124,5 @@ module.exports.setGuestWlan = function(sid, enable, options)
         });
     });
 };
+
+
