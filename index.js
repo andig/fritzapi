@@ -47,9 +47,9 @@ function Fritz(username, password, uri) {
     if (!Fritz.prototype.MICROFONE)         { Object.defineProperty( Fritz.prototype, "MICROFONE",         {value: module.exports.FUNCTION_MICROFONE,         writable: false}); }
     if (!Fritz.prototype.TEMPLATE)          { Object.defineProperty( Fritz.prototype, "TEMPLATE",          {value: module.exports.FUNCTION_TEMPLATE,          writable: false}); }
     if (!Fritz.prototype.HANFUNUNIT)        { Object.defineProperty( Fritz.prototype, "HANFUNUNIT",        {value: module.exports.FUNCTION_HANFUNUNIT,        writable: false}); }
-    if (!Fritz.prototype.SWITCHCTRL)        { Object.defineProperty( Fritz.prototype, "SWITCHCTRL",        {value: module.exports.FUNCTION_SWITCHCTRL,        writable: false}); }
-    if (!Fritz.prototype.LEVELCTRL)         { Object.defineProperty( Fritz.prototype, "LEVELCTRL",         {value: module.exports.FUNCTION_LEVELCTRL,         writable: false}); }
-    if (!Fritz.prototype.COLORCTRL)         { Object.defineProperty( Fritz.prototype, "COLORCTRL",         {value: module.exports.FUNCTION_COLORCTRL,         writable: false}); }
+    if (!Fritz.prototype.SWITCHCONTROL)     { Object.defineProperty( Fritz.prototype, "SWITCHCONTROL",     {value: module.exports.FUNCTION_SWITCHCONTROL,     writable: false}); }
+    if (!Fritz.prototype.LEVELCONTROL)      { Object.defineProperty( Fritz.prototype, "LEVELCONTROL",      {value: module.exports.FUNCTION_LEVELCONTROL,      writable: false}); }
+    if (!Fritz.prototype.COLORCONTROL)      { Object.defineProperty( Fritz.prototype, "COLORCONTROL",      {value: module.exports.FUNCTION_COLORCONTROL,      writable: false}); }
 }
 
 Fritz.prototype = {
@@ -394,13 +394,11 @@ function api2temp(param)
 function state2api(param)
 {
     // convert the input to an allowed value
-    if (isNumeric(param))
+    if (isNumeric(param)) {
         return (param > 2 ? 2 : param);
-    else if ((typeof param) == "string")
-    {
-        
-        switch(param.toUpperCase())
-        {
+    }
+    else if ((typeof param) == "string") {
+        switch(param.toUpperCase()) {
             case "OFF":     return 0; break;
             case "ON":      return 1; break;
             case "TOGGLE":  
@@ -512,9 +510,9 @@ module.exports.FUNCTION_DECTREPEATER        = 1 << 10; // AVM DECT Repeater
 module.exports.FUNCTION_MICROFONE           = 1 << 11; // Microphone
 module.exports.FUNCTION_TEMPLATE            = 1 << 12; // Template
 module.exports.FUNCTION_HANFUNUNIT          = 1 << 13; // HAN-FUN unit
-module.exports.FUNCTION_SWITCHCTRL          = 1 << 15; // Simple switch on/off
-module.exports.FUNCTION_LEVELCTRL           = 1 << 16; // level
-module.exports.FUNCTION_COLORCTRL           = 1 << 17; // color
+module.exports.FUNCTION_SWITCHCONTROL       = 1 << 15; // Simple switch on/off
+module.exports.FUNCTION_LEVELCONTROL        = 1 << 16; // level
+module.exports.FUNCTION_COLORCONTROL        = 1 << 17; // color
 
 /*
  * Session handling
@@ -875,7 +873,7 @@ module.exports.getBulbList = function(sid, options)
 module.exports.getColorBulbList = function(sid, options)
 {
     return module.exports.getDeviceListFiltered(sid, {
-        functionbitmask: module.exports.FUNCTION_LIGHT | module.exports.FUNCTION_COLORCTRL
+        functionbitmask: module.exports.FUNCTION_LIGHT | module.exports.FUNCTION_COLORCONTROL
         }, options).map(function(device) {
         return device.identifier;
     });
@@ -962,37 +960,10 @@ module.exports.setColorTemperature = function(sid, ain,  temperature, duration, 
 //     });
 // };
 
-// get battery charge - not part of Fritz API
-// - not really true, the button and the thermostat both have a 'battery' and a 'battterylow' property
-//   which seems to be a more reliable source than parsing a html page which might change or have a
-//   different text in other languages.
-module.exports.getBatteryCharge = function(sid, ain, options)
-{
-    return module.exports.getDevice(sid, ain, options).then(function(device) {
-        var req = {
-            method: 'POST',
-            form: {
-                sid: sid,
-                xhr: 1,
-                no_sidrenew: '',
-                device: device.id,
-                oldpage: '/net/home_auto_hkr_edit.lua',
-                back_to_page: '/net/network.lua'
-            }
-        };
-
-        return httpRequest('/data.lua', req, options).then(function(body) {
-            $ = cheerio.load(body);
-            // search for Batter(ie|y)
-            var battery = $('div>label:contains(Batter)+span').first().text().replace(/[\s%]/g, '');
-            return isNumeric(battery) ? parseInt(battery, 10) : null;
-        });
-    });
-};
-
-/* The above should be replaced by this, even though the whole device list is queried
-under the hood:
-
+// get battery charge
+// Attention: this function queries the whole device list to get the value for one device.
+// If multiple device will be queried for the battery status, a better approach would be to 
+// get the device list once and then filter out the devices of interest.
 module.exports.getBatteryCharge = function(sid, ain, options)
 {
     return module.exports.getDevice(sid, ain, options).then(function(device) {
@@ -1000,48 +971,16 @@ module.exports.getBatteryCharge = function(sid, ain, options)
     });
 };
 
-*/
-
-// Same here as for getBatteryCharge. 
-// The Comet thermostats have 'hkr.windowopenactiv' and hkr.windowopenactiveendtime' properties
-// which are more reliable than scanning a html page.
-module.exports.getWindowOpen = function(sid, ain, options)
-{
-    var dev = module.exports.getDevice(sid, ain, options),
-        req = httpRequest('/data.lua', {
-            method: 'POST',
-            form: {
-                sid: sid,
-                xhr: 1,
-                no_sidrenew: '',
-                page: 'sh',
-            }
-        }, options);
-
-    return Promise.join(dev, req, function(device, body) {
-        $ = cheerio.load(body);
-
-        var elems = $('td.iconrow[datalabel="' + device.name + '"] ~ td.temperature');
-        if (elems.length == 1) {
-            return $('img[src*=icon_window_open]', elems[0]).length == 1;
-        }
-
-        return false;
-    });
-};
-
-/* The above should be replaced by this, even though the whole device list is queried
-under the hood:
-
+// Get the window open flag of a thermostat
+// Attention: this function queries the whole device list to get the value for one device.
+// If multiple device will be queried for the window open status, a better approach would 
+// be to get the device list once and then filter out the devices of interest.
 module.exports.getWindowOpen = function(sid, ain, options)
 {
     return module.exports.getDevice(sid, ain, options).then(function(device) {
         return device.hkr.windowopenactiv == '0' ? false : true;
     });
 }
-
-*/
-
 
 
 /*
