@@ -40,6 +40,7 @@ In general, use of `getDeviceListInfos` is discouraged as the equivalent `getDev
 - Get state `getSwitchState`
 - Set on `setSwitchOn`
 - Set off `setSwitchOff`
+- Toggle `setSwitchToggle`
 - Get power `getSwitchPower`
 - Get energy `getSwitchEnergy`
 - Get presence status `getSwitchPresence`
@@ -66,6 +67,28 @@ Thermostat functions are only available as of Fritz!OS 6.36
 - Get battery charge `getBatteryCharge` (uses UI scraping, may be unstable)
 - Get window open `getWindowOpen` (uses UI scraping, may be unstable)
 
+### Fritz!DECT 500 and Telekom bulb functions
+
+Bulb functions are only available as of Fritz!OS 7.20
+
+- Get List of all bulbs `getBulbList`
+- Get List of all bulbs supporting colors `getColorBulbList`
+- Switch bulb on/off or toggle it `setSimpleOnOff`
+- Dimm a bulb `setLevel`, 0 - 255
+- Dimm a bulb `setLevelPercentage`, 0 - 100
+- Set the color and saturation `setColor`, see note 1
+- Set the color temperature `setColorTemperature`, see note 2
+
+**Note 1**  
+The color api calls of the FritzBox accept only a predefined set of values. 
+To get easy access to the predefined values fritzapi accepts the following values as the color:  
+`red, orange, yellow, lime, green, turquoise, cyan, lightblue, blue, purple, magenta, pink`  
+The saturation can be `0, 1 or 2` to select one of the predefined saturation values for the color.
+
+**Note 2**  
+The color temperature api calls of the FritzBox accept only a predefined set of values. 
+Valid values are `2700, 3000, 3400,3800, 4200, 4700, 5300, 5900 and 6500`.  
+Other values are adjusted by fritzapi to one of the above values.
 
 ### WLAN functions
 
@@ -156,15 +179,18 @@ These definitions remain cached by the Fritz!Box even if the device is no longer
 ### Outlets
 
     { identifier: '087610103568',
-      id: '16',
-      functionbitmask: '640',
-      fwversion: '03.59',
+      id: '17',
+      functionbitmask: '35712',
+      fwversion: '04.16',
       manufacturer: 'AVM',
       productname: 'FRITZ!DECT 200',
-      present: '0',
+      present: '1',
       name: 'FRITZ!DECT 200 #1',
-      switch: { state: '', mode: '', lock: '' },
-      powermeter: { power: '', energy: '' } }
+      switch: { state: '', mode: '', lock: '', devicelock : '' },
+      simpleonoff { state: '' },
+      powermeter: { voltage: '', power: '', energy: '' }, 
+      temperature: { celsius: '', offset: '' }
+      }
 
     { identifier: '116570031825',    
       id: '18',
@@ -193,13 +219,19 @@ These definitions remain cached by the Fritz!Box even if the device is no longer
     { identifier: '109710195784',
       id: '17',
       functionbitmask: '320',
-      fwversion: '03.66',
+      fwversion: '03.54',
       manufacturer: 'AVM',
       productname: 'Comet DECT',
-      present: '0',
+      present: '1',
+      txbusy: '0'
       name: 'Comet DECT',
+      battery: '90'
+      batterylow: '0'
       temperature: { celsius: '', offset: '' },
-      hkr: { tist: '', tsoll: '', absenk: '', komfort: '' } }
+      hkr: { tist: '49', tsoll: '253', absenk: '32', komfort: '42', lock: '1', devicelock: '1', errorcode: '0',  
+             windowopenactiv: '0', windowopenactiveendtime: '0', boostactive: '0', boostactiveendtime: '0', 
+             battery: '90', batterylow: '0', summeractive: '1', holidayactive: '0',
+             nextchange: { endperiod: '1598907600', tchange: '32' }} }
 
 ### HANFUN
 
@@ -227,10 +259,25 @@ HANFUN functions are accessible as "HANFUN unit" devices. Bitmask consists of HA
       etsiunitinfo: { etsideviceid: '406', unittype: '514', interfaces: '256' },
       alert: { state: '1' } }
 
+or a color bulb:
+
+    { identifier: '127010028190-1',
+      id: '2000',
+      functionbitmask: '237572',
+      fwversion: '0.0',
+      manufacturer: '0x319d',
+      productname: 'HAN-FUN',
+      present: '0',
+      txbusy: '0'
+      name: 'Bulb 1',
+      simpleonoff { state: '1' },
+      levelcontrol: { level: '255', levelpercentage: '100' },
+      colorcontrol: { supported_modes: '5', current_mode: '1', hue: '35', saturation: '214', temperature: '' },
+      etsiunitinfo: { etsideviceid: '406', unittype: '278', interfaces: '512,514,513' } }
+
 ## AHA HTTP Interface Documentation
 
 http://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AHA-HTTP-Interface.pdf
-
 
 ## Acknowledgements
 
