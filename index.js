@@ -903,7 +903,7 @@ module.exports.setLevelPercentage = function(sid, ain, levelInPercent, options)
 {
     return executeCommand(sid, 'setlevelpercentage&level=' + level2api(levelInPercent,true), ain, options).then(function(body) {
         // api does not return a value
-        return level;
+        return levelInPercent;
     });
 };
 
