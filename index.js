@@ -252,9 +252,9 @@ Fritz.prototype = {
     },
 
     // Blind related
-    // setBlind: function(ain, blindState) {
-    //     return this.call(module.exports.setBlind, ain, blindState);
-    // },
+    setBlind: function(ain, blindState) {
+         return this.call(module.exports.setBlind, ain, blindState);
+    },
 
 
     // ---------------------------------------------
@@ -273,7 +273,7 @@ Fritz.prototype = {
     setGuestWlan: function(enable) {
         return this.call(module.exports.setGuestWlan, enable);
     },
-    
+
     getPhoneList: function() {
         return executeCommand(this.sid, null, null, null, "/fon_num/foncalls_list.lua?csv=");
     },
@@ -401,11 +401,11 @@ function state2api(param)
         switch(param.toUpperCase()) {
             case "OFF":     return 0; break;
             case "ON":      return 1; break;
-            case "TOGGLE":  
+            case "TOGGLE":
             default:        return 2; break;
         }
     }
-    else     
+    else
         return 2;
 }
 
@@ -446,7 +446,7 @@ function colortemp2api(param)
 // Fritz color schemes
 // The fritzbox accepts only a limited range of hue/saturation combinations
 // to set the color of a bulb. The hue value must be one of the 12 predefined
-// values for the base colors and each of the hue values has its own set of 
+// values for the base colors and each of the hue values has its own set of
 // three saturation values.
 // Any attempt to use other hue/saturaion values fails silently.
 colors = {
@@ -483,7 +483,7 @@ function satindex2apisat(color, satindex)
         return col.sat[(satindex > 2 ? 0 : satindex)];
     else
         // unknow color, return a value that will change nothing
-        return 0;    
+        return 0;
 }
 
 // #############################################################################
@@ -839,12 +839,12 @@ module.exports.getTempComfort = function(sid, ain, options)
  * AVM Buttons Fritz!DECT 400 and Fritz!DECT 440
  * Querying a button isn't really useful because they don't have a state to query,
  * there is just a timestamp of the last short and long button press.
- * The only useful information is the battery status returned in the 'battery' and 
+ * The only useful information is the battery status returned in the 'battery' and
  * 'batterylow' property.
  * The Fritz!DECT 440 should have an additional 'temperature' property
  */
 
-// get a list of all button devices 
+// get a list of all button devices
 module.exports.getButtonList = function(sid, options)
 {
     return module.exports.getDeviceListFiltered(sid, {
@@ -859,7 +859,7 @@ module.exports.getButtonList = function(sid, options)
  * Light bulbs (HAN-FUN)
  */
 
-// get a list of all bulbs 
+// get a list of all bulbs
 module.exports.getBulbList = function(sid, options)
 {
     return module.exports.getDeviceListFiltered(sid, {
@@ -901,17 +901,17 @@ module.exports.setLevel = function(sid, ain, level, options)
 // Dimm the device, allowed values are 0 - 100
 module.exports.setLevelPercentage = function(sid, ain, levelInPercent, options)
 {
-    return executeCommand(sid, 'setlevelpercentage&level=' + level2api(level,true), ain, options).then(function(body) {
+    return executeCommand(sid, 'setlevelpercentage&level=' + level2api(levelInPercent,true), ain, options).then(function(body) {
         // api does not return a value
-        return level;
+        return levelInPercent;
     });
 };
 
 // Set the color and saturation of a color bulb
 // Valid color values are:
-// red, orange, yellow, lime, green, turquoise, cyan, 
+// red, orange, yellow, lime, green, turquoise, cyan,
 // lightblue, blue, purple, magenta and pink
-// Valid satindex values are: 0, 1 or 2 
+// Valid satindex values are: 0, 1 or 2
 module.exports.setColor = function(sid, ain,  color, satindex, duration, options)
 {
     return executeCommand(sid, 'setcolor&hue=' + color2apihue(color) +
@@ -923,7 +923,7 @@ module.exports.setColor = function(sid, ain,  color, satindex, duration, options
 };
 
 // Set the color temperature of a bulb.
-// Valid values are 2700, 3000, 3400,3800, 4200, 4700, 5300, 5900 and 6500. 
+// Valid values are 2700, 3000, 3400,3800, 4200, 4700, 5300, 5900 and 6500.
 // Other values are adjusted to one of the above values
 module.exports.setColorTemperature = function(sid, ain,  temperature, duration, options)
 {
@@ -936,7 +936,7 @@ module.exports.setColorTemperature = function(sid, ain,  temperature, duration, 
 };
 
 // get the color defaults
-// This is mostly useless because they are no defaults which can be changed but 
+// This is mostly useless because they are no defaults which can be changed but
 // fixed values. Only combinations returned by this api call are accepted by
 // setcolor and setcolortemperature.
 // module.exports.getColorDefaults = function(sid, ain, options)
@@ -948,21 +948,21 @@ module.exports.setColorTemperature = function(sid, ain,  temperature, duration, 
 
 // ------------------------------------------------
 // Not yet tested - deactivated for now
-// I don't know about any blind control unit with HANFUN support, but this API call makes 
+// I don't know about any blind control unit with HANFUN support, but this API call makes
 // it plausible that AVM or a partner has somthing like that in the pipeline.
-// 
-// module.exports.setBlind = function(sid, ain,  blindState, options)
-// {
-//     // „open“, „close“ or „stop“
-//     return executeCommand(sid, 'setblind&target=' + blindstate2api(blindState), ain, options).then(function(body) {
-//         // api does not return a value
-//         return blindState;
-//     });
-// };
+//
+module.exports.setBlind = function(sid, ain,  blindState, options)
+{
+   // „open“, „close“ or „stop“
+    return executeCommand(sid, 'setblind&target=' + blindState, ain, options).then(function(body) {
+        // api does not return a value
+         return blindState;
+     });
+};
 
 // get battery charge
 // Attention: this function queries the whole device list to get the value for one device.
-// If multiple device will be queried for the battery status, a better approach would be to 
+// If multiple device will be queried for the battery status, a better approach would be to
 // get the device list once and then filter out the devices of interest.
 module.exports.getBatteryCharge = function(sid, ain, options)
 {
@@ -973,7 +973,7 @@ module.exports.getBatteryCharge = function(sid, ain, options)
 
 // Get the window open flag of a thermostat
 // Attention: this function queries the whole device list to get the value for one device.
-// If multiple device will be queried for the window open status, a better approach would 
+// If multiple device will be queried for the window open status, a better approach would
 // be to get the device list once and then filter out the devices of interest.
 module.exports.getWindowOpen = function(sid, ain, options)
 {
@@ -1063,5 +1063,3 @@ module.exports.setGuestWlan = function(sid, enable, options)
         });
     });
 };
-
-
