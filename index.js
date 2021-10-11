@@ -213,6 +213,10 @@ Fritz.prototype = {
         return this.call(module.exports.setHkrWindowOpen, ain, endtime);
     },
 
+    setHkrOffset: function(deviceId, offset) {
+      return this.call(module.exports.setHkrOffset, deviceId, offset);
+    },
+
     // light related
 
     getBulbList: function() {
@@ -834,6 +838,42 @@ module.exports.setHkrWindowOpen = function(sid, ain, endtime, options)
     return executeCommand(sid, 'sethkrwindowopen&endtimestamp=' + time2api(endtime), ain, options).then(function(body) {
         // api does not return a value
         return endtime;
+    });
+};
+
+// activate window open  with end time or deactivate boost
+module.exports.setHkrOffset = function(sid, deviceId, offset, options)
+{
+    const path = '/net/home_auto_hkr_edit.lua';
+
+    const req = {
+      method: 'POST',
+      form: extend({
+        sid: sid,
+        xhr: 1,
+        lang: 'de',
+        no_sidrenew: '',
+        ule_device_name: '',
+        useajax: 1,
+        WindowOpenTimer: '',
+        WindowOpenTrigger: '',
+        tempsensor: '',
+        Roomtemp: '',
+        ExtTempsensorID: '',
+        Offset: offset,
+        back_to_page: 'sh_dev',
+        view: '',
+        graphState: 1,
+        apply: '',
+        device: deviceId,
+        oldpage: '/net/home_auto_hkr_edit.lua',
+      }),
+    };
+
+    return httpRequest(path, req, options)
+    .then(function(body) {
+      // api does not return a value
+        return offset;
     });
 };
 // ------------------------------------------------
