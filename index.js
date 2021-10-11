@@ -256,9 +256,9 @@ Fritz.prototype = {
     },
 
     // Blind related
-    // setBlind: function(ain, blindState) {
-    //     return this.call(module.exports.setBlind, ain, blindState);
-    // },
+    setBlind: function(ain, blindState) {
+         return this.call(module.exports.setBlind, ain, blindState);
+    },
 
 
     // ---------------------------------------------
@@ -944,9 +944,9 @@ module.exports.setLevel = function(sid, ain, level, options)
 // Dimm the device, allowed values are 0 - 100
 module.exports.setLevelPercentage = function(sid, ain, levelInPercent, options)
 {
-    return executeCommand(sid, 'setlevelpercentage&level=' + level2api(level,true), ain, options).then(function(body) {
+    return executeCommand(sid, 'setlevelpercentage&level=' + level2api(levelInPercent,true), ain, options).then(function(body) {
         // api does not return a value
-        return level;
+        return levelInPercent;
     });
 };
 
@@ -994,14 +994,14 @@ module.exports.setColorTemperature = function(sid, ain,  temperature, duration, 
 // I don't know about any blind control unit with HANFUN support, but this API call makes
 // it plausible that AVM or a partner has somthing like that in the pipeline.
 //
-// module.exports.setBlind = function(sid, ain,  blindState, options)
-// {
-//     // „open“, „close“ or „stop“
-//     return executeCommand(sid, 'setblind&target=' + blindstate2api(blindState), ain, options).then(function(body) {
-//         // api does not return a value
-//         return blindState;
-//     });
-// };
+module.exports.setBlind = function(sid, ain,  blindState, options)
+{
+   // „open“, „close“ or „stop“
+    return executeCommand(sid, 'setblind&target=' + blindState, ain, options).then(function(body) {
+        // api does not return a value
+         return blindState;
+     });
+};
 
 // get battery charge
 // Attention: this function queries the whole device list to get the value for one device.

@@ -1,3 +1,7 @@
+## 0.12.0
+
+- enable blind controll
+
 ## 0.10.3
 
 - expose temperature conversion helpers
