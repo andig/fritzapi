@@ -205,13 +205,17 @@ Fritz.prototype = {
         return this.call(module.exports.getTempComfort, ain);
     },
 
-    // setHkrBoost: function(ain, endtime) {
-    //     return this.call(module.exports.setHkrBoost, ain, endtime);
-    // },
+    setHkrBoost: function(ain, endtime) {
+        return this.call(module.exports.setHkrBoost, ain, endtime);
+    },
 
-    // setHkrWindowOpen: function(ain, endtime) {
-    //     return this.call(module.exports.setHkrWindowOpen, ain, endtime);
-    // },
+    setHkrWindowOpen: function(ain, endtime) {
+        return this.call(module.exports.setHkrWindowOpen, ain, endtime);
+    },
+
+    setHkrOffset: function(deviceId, offset) {
+      return this.call(module.exports.setHkrOffset, deviceId, offset);
+    },
 
     // light related
 
@@ -379,11 +383,14 @@ function api2temp(param)
     }
 }
 
-// function time2api(param)
-// {
-//     // convert the input to a unix timestamp
-//     return 0;
-// }
+function time2api(seconds)
+{
+  if (seconds <= 0) {
+    return 0;
+  }
+
+  return Date.now() / 1000 + Math.min(60 * 60 * 24, seconds);
+}
 
 // function api2time(param)
 // {
@@ -817,22 +824,58 @@ module.exports.getTempComfort = function(sid, ain, options)
 // Not yet tested - deactivated for now
 //
 // activate boost with end time or deactivate boost
-// module.exports.setHkrBoost = function(sid, ain, endtime, options)
-// {
-//     return executeCommand(sid, 'sethkrboost&endtimestamp=' + time2api(temp), ain, options).then(function(body) {
-//         // api does not return a value
-//         return temp;
-//     });
-// };
+module.exports.setHkrBoost = function(sid, ain, endtime, options)
+{
+    return executeCommand(sid, 'sethkrboost&endtimestamp=' + time2api(endtime), ain, options).then(function(body) {
+        // api does not return a value
+        return endtime;
+    });
+};
 
 // activate window open  with end time or deactivate boost
-// module.exports.setHkrWindowOpen = function(sid, ain, endtime, options)
-// {
-//     return executeCommand(sid, 'sethkrwindowopen&endtimestamp=' + time2api(temp), ain, options).then(function(body) {
-//         // api does not return a value
-//         return temp;
-//     });
-// };
+module.exports.setHkrWindowOpen = function(sid, ain, endtime, options)
+{
+    return executeCommand(sid, 'sethkrwindowopen&endtimestamp=' + time2api(endtime), ain, options).then(function(body) {
+        // api does not return a value
+        return endtime;
+    });
+};
+
+// activate window open  with end time or deactivate boost
+module.exports.setHkrOffset = function(sid, deviceId, offset, options)
+{
+    const path = '/net/home_auto_hkr_edit.lua';
+
+    const req = {
+      method: 'POST',
+      form: extend({
+        sid: sid,
+        xhr: 1,
+        lang: 'de',
+        no_sidrenew: '',
+        ule_device_name: '',
+        useajax: 1,
+        WindowOpenTimer: '',
+        WindowOpenTrigger: '',
+        tempsensor: '',
+        Roomtemp: '',
+        ExtTempsensorID: '',
+        Offset: offset,
+        back_to_page: 'sh_dev',
+        view: '',
+        graphState: 1,
+        apply: '',
+        device: deviceId,
+        oldpage: '/net/home_auto_hkr_edit.lua',
+      }),
+    };
+
+    return httpRequest(path, req, options)
+    .then(function(body) {
+      // api does not return a value
+        return offset;
+    });
+};
 // ------------------------------------------------
 
 /*
